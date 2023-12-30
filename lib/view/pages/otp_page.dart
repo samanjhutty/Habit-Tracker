@@ -7,7 +7,7 @@ import '../../assets/assets.dart';
 import '../../controller/cloud/signup_controller.dart';
 
 class OTPPage extends StatefulWidget {
-  const OTPPage({Key? key}) : super(key: key);
+  const OTPPage({super.key});
 
   final String title = 'OTP Page';
   @override

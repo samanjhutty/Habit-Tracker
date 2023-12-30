@@ -62,12 +62,12 @@ class MyApp extends StatelessWidget {
         title: 'Tracker',
         theme: ThemeData(
           colorScheme: ColorScheme.fromSeed(
-              seedColor: const Color(0xFFFE5A75), secondary: Colors.grey[350]),
+              seedColor: const Color(0xFFFAA6B1), secondary: Colors.grey[350]),
           useMaterial3: true,
         ),
         darkTheme: ThemeData(
           colorScheme: ColorScheme.fromSeed(
-              seedColor: const Color(0xFFFE5A75),
+              seedColor: const Color(0xFFFAA6B1), //0xFFFB5B76
               brightness: Brightness.dark,
               secondary: Colors.grey[850]),
           useMaterial3: true,

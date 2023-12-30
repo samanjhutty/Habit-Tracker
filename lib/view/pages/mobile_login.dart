@@ -6,7 +6,7 @@ import '../../assets/assets.dart';
 import '../../controller/cloud/signup_controller.dart';
 
 class MobileLogin extends StatefulWidget {
-  const MobileLogin({Key? key}) : super(key: key);
+  const MobileLogin({super.key});
 
   @override
   State<MobileLogin> createState() => _MobileLoginState();
