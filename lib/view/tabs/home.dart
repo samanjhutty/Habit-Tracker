@@ -15,7 +15,7 @@ class MyHomeTab extends StatefulWidget {
 
 class _MyHomeTabState extends State<MyHomeTab> {
   DateTime? startDate;
-  DbController db = Get.find();
+  DbController dbController = Get.find();
 
   @override
   void initState() {
@@ -39,10 +39,12 @@ class _MyHomeTabState extends State<MyHomeTab> {
             preferredSize: Size.fromHeight(graphHeight),
             child: SizedBox(
               height: graphHeight,
-              child: MonthSummary(
-                startDate: startDate!,
-                dataset: db.heatMapDataset,
-              ),
+              child: GetBuilder<DbController>(builder: (db) {
+                return MonthSummary(
+                  startDate: startDate!,
+                  dataset: db.heatMapDataset,
+                );
+              }),
             ),
           ),
           toolbarHeight: 80,

@@ -61,15 +61,20 @@ class DbController extends GetxController {
   }
 
   static String habbitListKey(DateTime date) {
-    String today = '${date.year}${date.month}${date.day}';
+    String year = date.year.toString();
+    String month =
+        date.month.isLowerThan(10) ? '0${date.month}' : date.month.toString();
+    String day =
+        date.day.isLowerThan(10) ? '0${date.day}' : date.day.toString();
 
-    return today;
+    return year + month + day;
   }
 
   static habbitListKeytoDateTime(String date) {
     int year = int.parse(date.substring(0, 4));
     int month = int.parse(date.substring(4, 6));
     int day = int.parse(date.substring(6, 8));
+
     return DateTime(year, month, day);
   }
 
@@ -152,7 +157,7 @@ class DbController extends GetxController {
     }
   }
 
-  double percentCompleted() {
+  Future<void> percentCompleted() async {
     double completed = 0.0;
     for (int i = 0; i < habitList.length; i++) {
       if (habitList[i].completed == true) {
@@ -161,19 +166,18 @@ class DbController extends GetxController {
     }
     double percentSummary =
         habitList.isNotEmpty ? completed / habitList.length : 0.0;
-    // box.put(BoxConstants.habitSummaryText + habbitListKey(DateTime.now()),
-    //     percentSummary);
+    await box.put(BoxConstants.habitSummaryText + habbitListKey(DateTime.now()),
+        percentSummary);
     print('Percent completed: $percentSummary');
-    return percentSummary;
   }
 
-  loadHeatMap() {
+  void loadHeatMap() async {
     DateTime date = habbitListKeytoDateTime(box.get(BoxConstants.startDateKey));
 
     int dayInBW = DateTime.now().difference(date).inDays;
     for (int i = 0; i <= dayInBW; i++) {
-      double strength = percentCompleted();
-      // box.get(BoxConstants.habitSummaryText + habbitListKey(date)) ?? 0.0;
+      double strength =
+          box.get(BoxConstants.habitSummaryText + habbitListKey(date)) ?? 0.0;
 
       int year = date.year;
       int month = date.month;
@@ -183,6 +187,7 @@ class DbController extends GetxController {
       };
 
       heatMapDataset.addEntries(summary.entries);
+      update();
       print('loop ran, entries: ${heatMapDataset.entries}');
       date = date.add(const Duration(days: 1));
     }

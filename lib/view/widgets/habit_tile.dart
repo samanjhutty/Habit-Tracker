@@ -60,6 +60,7 @@ class _HabitTileState extends State<HabitTile> {
                         double initialTime = list.totalHabbitTime -
                             (list.initialHabbitTime + list.elapsedTime);
 
+                        db.percentCompleted();
                         db.loadHeatMap();
 
                         return Padding(

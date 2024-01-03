@@ -39,6 +39,7 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    Color color = box.get(BoxConstants.themeColor) ?? const Color(0xFFFB5B76);
     return MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (context) => ProfileController()),
@@ -62,12 +63,12 @@ class MyApp extends StatelessWidget {
         title: 'Tracker',
         theme: ThemeData(
           colorScheme: ColorScheme.fromSeed(
-              seedColor: const Color(0xFFFAA6B1), secondary: Colors.grey[350]),
+              seedColor: color, secondary: Colors.grey[350]),
           useMaterial3: true,
         ),
         darkTheme: ThemeData(
           colorScheme: ColorScheme.fromSeed(
-              seedColor: const Color(0xFFFAA6B1), //0xFFFB5B76
+              seedColor: color,
               brightness: Brightness.dark,
               secondary: Colors.grey[850]),
           useMaterial3: true,
@@ -105,13 +106,11 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
   }
 
   _getList() async {
-    List localList = await box
-            .get(BoxConstants.habitListKeyText +
-                DbController.habbitListKey(DateTime.now()))
-            .map((e) => e as HabitModel)
-            .toList() ??
+    List list = await box.get(BoxConstants.habitListKeyText +
+            DbController.habbitListKey(DateTime.now())) ??
         <HabitModel>[];
 
+    List localList = list..map((e) => e as HabitModel).toList();
     setState(() {
       dbController.habitList = localList.cast<HabitModel>();
     });

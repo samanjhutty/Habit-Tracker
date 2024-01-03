@@ -26,7 +26,7 @@ class _MonthSummaryState extends State<MonthSummary> {
         textColor: Colors.grey,
         showText: true,
         showColorTip: false,
-        scrollable: true,
+        scrollable: false,
         colorsets: {1: scheme.primary},
         size: 30,
       ),
