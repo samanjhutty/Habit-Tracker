@@ -1,7 +1,7 @@
 import 'package:get/get.dart';
 import '../assets/assets.dart';
 import 'cloud/profile_controller.dart';
-import 'local/db_controller.dart';
+import 'db_controller.dart';
 import 'time_controller.dart';
 
 class ControllerBinding extends Bindings {

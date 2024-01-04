@@ -30,73 +30,80 @@ class _MobileLoginState extends State<MobileLogin> {
   }
 
   @override
-  Widget build(BuildContext context) => Material(
-        child: SafeArea(
-          child: Stack(children: [
-            AppBar(),
-            Center(
-                child: SingleChildScrollView(
-              child: Column(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    const Padding(
-                        padding: EdgeInsets.only(bottom: 16),
-                        child: CircleAvatar(
-                            radius: 64, child: Icon(Icons.phone, size: 60))),
-                    const Padding(
-                        padding: EdgeInsets.only(top: 16),
-                        child: Text('Sign Up with Mobile',
-                            style: TextStyle(
-                                fontFeatures: [FontFeature.swash()],
-                                fontSize: 32))),
-                    const SizedBox(height: 8),
-                    const Padding(
-                        padding: EdgeInsets.only(bottom: 16),
-                        child: Text(
-                            'Enter a 10 digit mobile number to continue.')),
-                    const SizedBox(height: 24),
-                    Container(
-                        padding: const EdgeInsets.only(bottom: 16),
-                        width: myWidth,
-                        child: TextFormField(
-                            controller: context.watch<SignUpAuth>().phone,
-                            decoration: InputDecoration(
-                                labelText: 'Enter Mobile Number',
-                                prefixText:
-                                    context.watch<SignUpAuth>().countryCode,
-                                border: const OutlineInputBorder()),
-                            maxLength: 10,
-                            keyboardType: TextInputType.phone)),
-                    Container(
-                        padding: const EdgeInsets.only(top: 16),
-                        width: myWidth,
-                        child: Consumer<MyWidgets>(
-                            builder: (context, provider, child) {
-                          return ElevatedButton(
-                              style: ElevatedButton.styleFrom(
-                                  padding:
-                                      const EdgeInsets.symmetric(vertical: 16)),
-                              onPressed: () async {
-                                btn = provider.myAnimation(progress: true);
-                                await context.read<SignUpAuth>().mobileSignIn();
-                              },
-                              child: btn);
-                        })),
-                    Padding(
-                        padding: const EdgeInsets.only(top: 16),
-                        child: Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              const Text('Already have an Account?'),
-                              TextButton(
-                                  onPressed: () => Get.offNamed('/signin'),
-                                  child: const Text('Sign In'))
-                            ]))
-                  ]),
-            ))
-          ]),
-        ),
-      );
+  Widget build(BuildContext context) {
+    ColorScheme scheme = Theme.of(context).colorScheme;
+    return Material(
+      child: SafeArea(
+        child: Stack(children: [
+          AppBar(),
+          Center(
+              child: SingleChildScrollView(
+            child: Column(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  Padding(
+                      padding: const EdgeInsets.only(bottom: 16),
+                      child: CircleAvatar(
+                          backgroundColor: scheme.primary,
+                          foregroundColor: scheme.onPrimary,
+                          radius: 64,
+                          child: const Icon(Icons.phone, size: 60))),
+                  const Padding(
+                      padding: EdgeInsets.only(top: 16),
+                      child: Text('Sign Up with Mobile',
+                          style: TextStyle(
+                              fontFeatures: [FontFeature.swash()],
+                              fontSize: 32))),
+                  const SizedBox(height: 8),
+                  const Padding(
+                      padding: EdgeInsets.only(bottom: 16),
+                      child:
+                          Text('Enter a 10 digit mobile number to continue.')),
+                  const SizedBox(height: 24),
+                  Container(
+                      padding: const EdgeInsets.only(bottom: 16),
+                      width: myWidth,
+                      child: TextFormField(
+                          controller: context.watch<SignUpAuth>().phone,
+                          decoration: InputDecoration(
+                              labelText: 'Enter Mobile Number',
+                              prefixText:
+                                  context.watch<SignUpAuth>().countryCode,
+                              border: const OutlineInputBorder()),
+                          maxLength: 10,
+                          keyboardType: TextInputType.phone)),
+                  Container(
+                      padding: const EdgeInsets.only(top: 16),
+                      width: myWidth,
+                      child: Consumer<MyWidgets>(
+                          builder: (context, provider, child) {
+                        return ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                                padding:
+                                    const EdgeInsets.symmetric(vertical: 16)),
+                            onPressed: () async {
+                              btn = provider.myAnimation(progress: true);
+                              await context.read<SignUpAuth>().mobileSignIn();
+                            },
+                            child: btn);
+                      })),
+                  Padding(
+                      padding: const EdgeInsets.only(top: 16),
+                      child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            const Text('Already have an Account?'),
+                            TextButton(
+                                onPressed: () => Get.offNamed('/signin'),
+                                child: const Text('Sign In'))
+                          ]))
+                ]),
+          ))
+        ]),
+      ),
+    );
+  }
+
   @override
   void dispose() {
     provider.phone.clear();

@@ -8,7 +8,7 @@ import 'controller/cloud/profile_controller.dart';
 import 'controller/cloud/signin_controller.dart';
 import 'controller/cloud/signup_controller.dart';
 import 'controller/local/db_constants.dart';
-import 'controller/local/db_controller.dart';
+import 'controller/db_controller.dart';
 import 'model/habit_model.dart';
 import 'view/pages/add_habit.dart';
 import 'view/pages/mobile_login.dart';
@@ -39,7 +39,8 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    Color color = box.get(BoxConstants.themeColor) ?? const Color(0xFFFB5B76);
+    Color color = Color(
+        box.get(BoxConstants.appThemeColor) ?? const Color(0xFFFB5B76).value);
     return MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (context) => ProfileController()),
@@ -70,7 +71,7 @@ class MyApp extends StatelessWidget {
           colorScheme: ColorScheme.fromSeed(
               seedColor: color,
               brightness: Brightness.dark,
-              secondary: Colors.grey[850]),
+              secondary: Colors.grey[700]),
           useMaterial3: true,
         ),
       ),

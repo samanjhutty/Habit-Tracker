@@ -24,6 +24,7 @@ class _SignInState extends State<SignIn> {
 
   @override
   Widget build(BuildContext context) {
+    ColorScheme scheme = Theme.of(context).colorScheme;
     return Material(
       child: SafeArea(
         child: Stack(children: [
@@ -31,10 +32,13 @@ class _SignInState extends State<SignIn> {
               child: SingleChildScrollView(
                   child: Column(
             children: [
-              const Padding(
-                  padding: EdgeInsets.only(bottom: 16),
+              Padding(
+                  padding: const EdgeInsets.only(bottom: 16),
                   child: CircleAvatar(
-                      radius: 60, child: Icon(Icons.login_rounded, size: 56))),
+                      backgroundColor: scheme.primary,
+                      foregroundColor: scheme.onPrimary,
+                      radius: 60,
+                      child: const Icon(Icons.login_rounded, size: 56))),
               const Padding(
                   padding: EdgeInsets.only(bottom: 16),
                   child: Text('Sign In',
@@ -135,6 +139,9 @@ class _SignInState extends State<SignIn> {
                       children: [
                         CircleAvatar(
                           child: IconButton(
+                              style: IconButton.styleFrom(
+                                  backgroundColor: scheme.primary,
+                                  foregroundColor: scheme.onPrimary),
                               tooltip: 'Phone',
                               onPressed: () =>
                                   Navigator.pushNamed(context, '/mobile'),
@@ -143,6 +150,9 @@ class _SignInState extends State<SignIn> {
                         const SizedBox(width: 35),
                         CircleAvatar(
                             child: IconButton(
+                                style: IconButton.styleFrom(
+                                    backgroundColor: scheme.primary,
+                                    foregroundColor: scheme.onPrimary),
                                 tooltip: 'Google',
                                 onPressed: () async => await context
                                     .read<SignInAuth>()

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:percent_indicator/percent_indicator.dart';
-import '../../controller/local/db_controller.dart';
+import '../../controller/db_controller.dart';
 import '../../controller/time_controller.dart';
 import '../../model/habit_model.dart';
 import '../pages/add_habit.dart';

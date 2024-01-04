@@ -5,8 +5,8 @@ late Box box;
 
 class BoxConstants {
   static const boxName = 'Habit-Tracker';
-  static const themeColor = 'Theme-Color';
   static const startDateKey = 'APP-START-DATE';
+  static const appThemeColor = 'App-Theme';
 
   // For each individual habit
   static const habitListKeyText = 'HabitList-day:';

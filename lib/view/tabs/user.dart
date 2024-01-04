@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import 'package:habit_tracker/controller/cloud/profile_controller.dart';
 import 'package:habit_tracker/controller/cloud/signin_controller.dart';
 import 'package:habit_tracker/controller/cloud/signup_controller.dart';
+import 'package:habit_tracker/controller/local/db_constants.dart';
 import 'package:provider/provider.dart';
 
 class UserProfile extends StatefulWidget {
@@ -13,20 +14,32 @@ class UserProfile extends StatefulWidget {
   State<UserProfile> createState() => _UserProfileState();
 }
 
-class _UserProfileState extends State<UserProfile> {
+class _UserProfileState extends State<UserProfile>
+    with TickerProviderStateMixin {
   FirebaseAuth auth = FirebaseAuth.instance;
+  Color? appThemeColor;
+  bool? selected = false;
 
   @override
   Widget build(BuildContext context) {
     ColorScheme scheme = Theme.of(context).colorScheme;
+    Size device = MediaQuery.of(context).size;
     return Material(
       child: Scaffold(
           appBar: AppBar(title:
               Consumer3<SignInAuth, SignUpAuth, ProfileController>(
                   builder: (context, signin, signup, profile, child) {
-            return Text(
-              'Greetings ${auth.currentUser?.displayName ?? 'Guest'}!',
-              style: const TextStyle(fontWeight: FontWeight.w600),
+            return Row(
+              children: [
+                Text(
+                  'Greetings ${auth.currentUser?.displayName ?? 'Guest'} ',
+                  style: const TextStyle(fontWeight: FontWeight.w600),
+                ),
+                const Icon(
+                  Icons.waving_hand,
+                  color: Colors.amber,
+                )
+              ],
             );
           })),
           body: Padding(
@@ -72,11 +85,14 @@ class _UserProfileState extends State<UserProfile> {
                           ],
                         )
                       : Column(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            Card(
-                              child: Padding(
-                                padding: const EdgeInsets.all(16),
-                                child: ListTile(
+                            Column(
+                              children: [
+                                SizedBox(
+                                  height: device.height * 0.01,
+                                ),
+                                ListTile(
                                   trailing: CircleAvatar(
                                     backgroundImage: NetworkImage(
                                         auth.currentUser!.photoURL!),
@@ -89,142 +105,255 @@ class _UserProfileState extends State<UserProfile> {
                                   ),
                                   subtitle: Text(auth.currentUser!.email!),
                                 ),
+                                const SizedBox(height: 8),
+                                Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceEvenly,
+                                  children: [
+                                    Expanded(
+                                      child: ElevatedButton.icon(
+                                        style: ElevatedButton.styleFrom(
+                                            padding: const EdgeInsets.symmetric(
+                                                vertical: 32),
+                                            shape: RoundedRectangleBorder(
+                                                borderRadius:
+                                                    BorderRadius.circular(8))),
+                                        onPressed: () =>
+                                            Get.toNamed('/profile'),
+                                        label: const Text('Edit'),
+                                        icon: const Icon(Icons.edit),
+                                      ),
+                                    ),
+                                    const SizedBox(width: 8),
+                                    Expanded(
+                                      child: ElevatedButton.icon(
+                                        style: ElevatedButton.styleFrom(
+                                            padding: const EdgeInsets.symmetric(
+                                                vertical: 32),
+                                            shape: RoundedRectangleBorder(
+                                                borderRadius:
+                                                    BorderRadius.circular(8))),
+                                        onPressed: () => showBottomSheet(
+                                            context: context,
+                                            builder: (context) {
+                                              return BottomSheet(
+                                                  backgroundColor:
+                                                      scheme.secondary,
+                                                  showDragHandle: true,
+                                                  animationController:
+                                                      AnimationController(
+                                                          vsync: this),
+                                                  onClosing: () {
+                                                    appThemeColor ??=
+                                                        const Color(0xFFFB5B76);
+                                                    print(appThemeColor);
+                                                    box.put(
+                                                        BoxConstants
+                                                            .appThemeColor,
+                                                        appThemeColor!.value);
+                                                    Get.rawSnackbar(
+                                                        message:
+                                                            'Please restart app to see changes.');
+                                                  },
+                                                  builder: ((context) => Column(
+                                                        mainAxisSize:
+                                                            MainAxisSize.min,
+                                                        children: [
+                                                          RadioListTile(
+                                                            value: selected!,
+                                                            groupValue:
+                                                                selected!,
+                                                            onChanged: (value) {
+                                                              setState(() {
+                                                                selected =
+                                                                    value;
+                                                              });
+
+                                                              appThemeColor =
+                                                                  const Color(
+                                                                      0xFFFB5B76);
+                                                            },
+                                                            title: Row(
+                                                              mainAxisAlignment:
+                                                                  MainAxisAlignment
+                                                                      .spaceBetween,
+                                                              children: [
+                                                                const Text(
+                                                                    'Default'),
+                                                                Container(
+                                                                  decoration: BoxDecoration(
+                                                                      color: scheme
+                                                                          .secondary,
+                                                                      shape: BoxShape
+                                                                          .circle),
+                                                                  padding:
+                                                                      const EdgeInsets
+                                                                          .all(
+                                                                          4),
+                                                                  child:
+                                                                      const CircleAvatar(
+                                                                    radius: 16,
+                                                                    backgroundColor:
+                                                                        Color(
+                                                                            0xFFFB5B76),
+                                                                  ),
+                                                                )
+                                                              ],
+                                                            ),
+                                                          ),
+                                                          RadioListTile(
+                                                            value: selected!,
+                                                            groupValue:
+                                                                !selected!,
+                                                            onChanged: (value) {
+                                                              setState(() {
+                                                                selected =
+                                                                    value;
+                                                              });
+                                                              appThemeColor = Colors
+                                                                  .lightGreenAccent;
+                                                            },
+                                                            title: Row(
+                                                              mainAxisAlignment:
+                                                                  MainAxisAlignment
+                                                                      .spaceBetween,
+                                                              children: [
+                                                                const Text(
+                                                                    'Light Green'),
+                                                                Container(
+                                                                  decoration: BoxDecoration(
+                                                                      color: scheme
+                                                                          .secondary,
+                                                                      shape: BoxShape
+                                                                          .circle),
+                                                                  padding:
+                                                                      const EdgeInsets
+                                                                          .all(
+                                                                          4),
+                                                                  child:
+                                                                      const CircleAvatar(
+                                                                    radius: 16,
+                                                                    backgroundColor:
+                                                                        Colors
+                                                                            .lightGreenAccent,
+                                                                  ),
+                                                                )
+                                                              ],
+                                                            ),
+                                                          ),
+                                                          RadioListTile(
+                                                            value: selected!,
+                                                            groupValue:
+                                                                !selected!,
+                                                            onChanged: (value) {
+                                                              setState(() {
+                                                                selected =
+                                                                    value;
+                                                              });
+                                                              appThemeColor = Colors
+                                                                  .lightBlueAccent;
+                                                            },
+                                                            title: Row(
+                                                              mainAxisAlignment:
+                                                                  MainAxisAlignment
+                                                                      .spaceBetween,
+                                                              children: [
+                                                                const Text(
+                                                                    'Light Blue'),
+                                                                Container(
+                                                                  decoration: BoxDecoration(
+                                                                      color: scheme
+                                                                          .secondary,
+                                                                      shape: BoxShape
+                                                                          .circle),
+                                                                  padding:
+                                                                      const EdgeInsets
+                                                                          .all(
+                                                                          4),
+                                                                  child:
+                                                                      const CircleAvatar(
+                                                                    radius: 16,
+                                                                    backgroundColor:
+                                                                        Colors
+                                                                            .lightBlueAccent,
+                                                                  ),
+                                                                )
+                                                              ],
+                                                            ),
+                                                          )
+                                                        ],
+                                                      )));
+                                            }),
+                                        label: const Text('Theme'),
+                                        icon: const Icon(Icons.color_lens),
+                                      ),
+                                    ),
+                                    const SizedBox(width: 8),
+                                    Expanded(
+                                      child: ElevatedButton.icon(
+                                        style: ElevatedButton.styleFrom(
+                                            padding: const EdgeInsets.symmetric(
+                                                vertical: 32),
+                                            shape: RoundedRectangleBorder(
+                                                borderRadius:
+                                                    BorderRadius.circular(8))),
+                                        onPressed: () {
+                                          for (var values in box.values) {
+                                            print(values);
+                                          }
+                                        },
+                                        label: const Text('Sync'),
+                                        icon: const Icon(Icons.sync),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                const Padding(
+                                  padding: EdgeInsets.all(16),
+                                  child: Text(
+                                      'Please sync your data if your previous data is not showing or loading in home tab.'),
+                                )
+                              ],
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.only(bottom: 16),
+                              child: IconButton.outlined(
+                                style: IconButton.styleFrom(
+                                    shape: RoundedRectangleBorder(
+                                        side: BorderSide(color: scheme.error),
+                                        borderRadius:
+                                            BorderRadius.circular(8))),
+                                onPressed: () => showDialog(
+                                    context: context,
+                                    builder: (builder) => AlertDialog(
+                                          actionsPadding: const EdgeInsets.only(
+                                              right: 16, bottom: 16),
+                                          title: const Text('Logout'),
+                                          content: const Text(
+                                              'Do you really wish to logout?'),
+                                          actions: [
+                                            TextButton(
+                                                onPressed: () =>
+                                                    navigator!.pop(),
+                                                child: const Text('Cancel')),
+                                            TextButton(
+                                                onPressed: () {
+                                                  signin.logout();
+                                                  navigator!.pop();
+                                                },
+                                                child: const Text('Logout'))
+                                          ],
+                                        )),
+                                icon: ListTile(
+                                  leading: Icon(
+                                    Icons.logout,
+                                    color: scheme.error,
+                                  ),
+                                  title: Text('Logout',
+                                      style: TextStyle(color: scheme.error)),
+                                ),
                               ),
                             ),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                              children: [
-                                ElevatedButton.icon(
-                                  style: ElevatedButton.styleFrom(
-                                      shape: RoundedRectangleBorder(
-                                          borderRadius:
-                                              BorderRadius.circular(8))),
-                                  onPressed: () => Get.toNamed('/profile'),
-                                  label: const Text('Edit Profile'),
-                                  icon: const Icon(Icons.edit),
-                                ),
-                                ElevatedButton.icon(
-                                  style: ElevatedButton.styleFrom(
-                                      shape: RoundedRectangleBorder(
-                                          borderRadius:
-                                              BorderRadius.circular(8))),
-                                  onPressed: () => showBottomSheet(
-                                      context: context,
-                                      builder: (conetext) {
-                                        Color? themeColor;
-                                        return BottomSheet(
-                                            onClosing: () {
-                                              print(themeColor);
-                                            },
-                                            builder: ((context) => Column(
-                                                  children: [
-                                                    ListTile(
-                                                      onTap: () {
-                                                        themeColor = Colors
-                                                            .lightGreenAccent;
-                                                      },
-                                                      leading:
-                                                          const CircleAvatar(
-                                                              child:
-                                                                  CircleAvatar(
-                                                        backgroundColor: Colors
-                                                            .lightGreenAccent,
-                                                      )),
-                                                      title: const Text(
-                                                          'Light Green'),
-                                                    ),
-                                                    ListTile(
-                                                      onTap: () {
-                                                        themeColor = Colors
-                                                            .lightGreenAccent;
-                                                      },
-                                                      leading:
-                                                          const CircleAvatar(
-                                                              child:
-                                                                  CircleAvatar(
-                                                        backgroundColor: Colors
-                                                            .lightGreenAccent,
-                                                      )),
-                                                      title: const Text(
-                                                          'Light Green'),
-                                                    ),
-                                                    ListTile(
-                                                      onTap: () {
-                                                        themeColor = Colors
-                                                            .lightGreenAccent;
-                                                      },
-                                                      leading:
-                                                          const CircleAvatar(
-                                                              child:
-                                                                  CircleAvatar(
-                                                        backgroundColor: Colors
-                                                            .lightGreenAccent,
-                                                      )),
-                                                      title: const Text(
-                                                          'Light Green'),
-                                                    ),
-                                                    ListTile(
-                                                      onTap: () {
-                                                        themeColor = Colors
-                                                            .lightGreenAccent;
-                                                      },
-                                                      leading:
-                                                          const CircleAvatar(
-                                                              child:
-                                                                  CircleAvatar(
-                                                        backgroundColor: Colors
-                                                            .lightGreenAccent,
-                                                      )),
-                                                      title: const Text(
-                                                          'Light Green'),
-                                                    ),
-                                                    ListTile(
-                                                      onTap: () {
-                                                        themeColor = Colors
-                                                            .lightGreenAccent;
-                                                      },
-                                                      leading:
-                                                          const CircleAvatar(
-                                                              child:
-                                                                  CircleAvatar(
-                                                        backgroundColor: Colors
-                                                            .lightGreenAccent,
-                                                      )),
-                                                      title: const Text(
-                                                          'Light Green'),
-                                                    ),
-                                                    ListTile(
-                                                      onTap: () {
-                                                        themeColor = Colors
-                                                            .lightGreenAccent;
-                                                      },
-                                                      leading:
-                                                          const CircleAvatar(
-                                                              child:
-                                                                  CircleAvatar(
-                                                        backgroundColor: Colors
-                                                            .lightGreenAccent,
-                                                      )),
-                                                      title: const Text(
-                                                          'Light Green'),
-                                                    ),
-                                                  ],
-                                                )));
-                                      }),
-                                  label: const Text('Theme'),
-                                  icon: const Icon(Icons.color_lens),
-                                ),
-                                ElevatedButton.icon(
-                                  style: ElevatedButton.styleFrom(
-                                      shape: RoundedRectangleBorder(
-                                          borderRadius:
-                                              BorderRadius.circular(8))),
-                                  onPressed: () {},
-                                  label: const Text('Sync'),
-                                  icon: const Icon(Icons.sync),
-                                ),
-                              ],
-                            )
                           ],
                         );
                 },

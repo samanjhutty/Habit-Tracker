@@ -8,6 +8,7 @@ import 'package:habit_tracker/model/habit_model.dart';
 class DbController extends GetxController {
   List<HabitModel> habitList = <HabitModel>[];
   Map<DateTime, int> heatMapDataset = {};
+
   void refreshdb() => update();
   newHabit(
       {required String title,
@@ -187,7 +188,6 @@ class DbController extends GetxController {
       };
 
       heatMapDataset.addEntries(summary.entries);
-      update();
       print('loop ran, entries: ${heatMapDataset.entries}');
       date = date.add(const Duration(days: 1));
     }

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import '../../controller/local/db_controller.dart';
+import '../../controller/db_controller.dart';
 import '../widgets/habit_tile.dart';
 import '../widgets/month_summary.dart';
 

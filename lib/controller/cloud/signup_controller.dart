@@ -32,12 +32,6 @@ class SignUpAuth extends ChangeNotifier {
     confirmPassword.clear();
   }
 
-  Future<void> logout() async {
-    await _auth.signOut();
-    notifyListeners();
-    Get.rawSnackbar(message: 'Logged out Sucessfully');
-  }
-
   refresh() => notifyListeners();
 
   Future<void> mobileSignIn() async {

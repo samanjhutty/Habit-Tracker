@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import '../../controller/local/db_constants.dart';
-import '../../controller/local/db_controller.dart';
+import '../../controller/db_controller.dart';
 import '../../controller/time_controller.dart';
 import '../../model/habit_model.dart';
 

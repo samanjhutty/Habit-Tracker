@@ -36,6 +36,8 @@ class _SignUpState extends State<SignUp> {
                   padding: const EdgeInsets.only(bottom: 16),
                   child: Consumer<ProfileController>(
                     builder: (context, value, child) => CircleAvatar(
+                      backgroundColor: scheme.primary,
+                      foregroundColor: scheme.onPrimary,
                       radius: 60,
                       child: value.image == null && value.webImage == null
                           ? const Icon(Icons.login_rounded, size: 56)
