@@ -1,3 +1,4 @@
+import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -33,6 +34,15 @@ void main() async {
   await Hive.initFlutter();
   Hive.registerAdapter(HabitModelAdapter());
   box = await Hive.openBox(BoxConstants.boxName);
+  AwesomeNotifications().initialize(
+      null,
+      [
+        NotificationChannel(
+            channelKey: 'Habit-Completed',
+            channelName: 'Habit Completed',
+            channelDescription: 'Notifies when a habit is Completed')
+      ],
+      debug: true);
 
   runApp(const MyApp());
 }
@@ -107,6 +117,13 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
           DbController.habbitListKey(DateTime.now()));
     }
     user != null ? _getCloudList() : _getList();
+
+    AwesomeNotifications().isNotificationAllowed().then((value) {
+      if (!value) {
+        // Checking if notifications are allowed
+        AwesomeNotifications().requestPermissionToSendNotifications();
+      }
+    });
     super.initState();
   }
 
@@ -124,15 +141,21 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
   _getCloudList() async {
     FirebaseFirestore firestore = FirebaseFirestore.instance;
     try {
-      var map = await firestore
+      var snapshot = await firestore
           .collection(CloudConstants.collections)
           .doc(CloudConstants.docName + user!.uid)
           .get();
+      List map = snapshot.get(CloudConstants.habitListKeyText +
+          DbController.habbitListKey(DateTime.now()));
 
-      print(map.exists
-          ? map.get(CloudConstants.habitList +
-              DbController.habbitListKey(DateTime.now()))
-          : []);
+      List<Map<String, dynamic>> habitListMap =
+          map.cast<Map<String, dynamic>>();
+
+      for (var element in habitListMap) {
+        dbController.habitList.add(HabitModel.fromMap(element));
+      }
+      Future.delayed(const Duration(milliseconds: 1))
+          .then((value) => setState(() {}));
     } catch (e) {
       print('Unexpected error:$e');
     }

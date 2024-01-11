@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
@@ -17,15 +18,38 @@ class DbController extends GetxController {
 
   void refreshdb() => update();
 
-  void syncToCloud() {
-    for (var values in box.values) {
-      firestore.add(values);
-      print(values);
+  ///Save all the local saved values to Cloud Firestore.
+  void syncToCloud() async {
+    Get.rawSnackbar(message: 'This may take sometime...');
+
+    for (int index = 0; index < box.length; index++) {
+      await firestore
+          .doc(CloudConstants.docName + _user!.uid)
+          .set({'${box.keyAt(index)}': box.getAt(index)});
     }
+    Get.rawSnackbar(message: 'All data is synced to cloud');
   }
 
+  ///Update List on Changes to Databse
+  void saveUpdatedList() async {
+    _user != null
+        ? await firestore.doc(CloudConstants.docName + _user.uid).set(toMap(
+            CloudConstants.habitListKeyText + habbitListKey(DateTime.now()),
+            habitListToMap(habitList)))
+        : await box.put(
+            BoxConstants.habitListKeyText +
+                DbController.habbitListKey(DateTime.now()),
+            habitList);
+
+    update();
+  }
+
+  ///Return a Map to store values to firestore
   Map<String, dynamic> toMap(String key, dynamic data) => {key: data};
 
+  ///Converts a List<HabitModel> to List of Map<String, dynamic>
+  ///
+  ///helps in storing values to firestore
   List<Map<String, dynamic>> habitListToMap(List<HabitModel> habitList) {
     List<Map<String, dynamic>> mapList = [];
     for (HabitModel element in habitList) {
@@ -36,6 +60,7 @@ class DbController extends GetxController {
     return mapList;
   }
 
+  ///Add a new Habit to Database.
   newHabit(
       {required String title,
       required double totalTime,
@@ -49,7 +74,7 @@ class DbController extends GetxController {
         completed: false));
     _user != null
         ? await firestore.doc(CloudConstants.docName + _user.uid).set(toMap(
-            CloudConstants.habitList + habbitListKey(DateTime.now()),
+            CloudConstants.habitListKeyText + habbitListKey(DateTime.now()),
             habitListToMap(habitList)))
         : await box.put(
             BoxConstants.habitListKeyText + habbitListKey(DateTime.now()),
@@ -58,6 +83,7 @@ class DbController extends GetxController {
     update();
   }
 
+  ///Update existing Habit in Database.
   updateHabit(
       {required int index,
       required String title,
@@ -73,12 +99,17 @@ class DbController extends GetxController {
         totalHabbitTime: totalTime,
         running: isStart,
         completed: initilTime == totalTime ? true : false);
-    await box.put(listDayKey, habitList);
+    _user != null
+        ? await firestore
+            .doc(CloudConstants.docName + _user.uid)
+            .set(toMap(listDayKey, habitListToMap(habitList)))
+        : await box.put(listDayKey, habitList);
     print('habit updated');
 
     update();
   }
 
+  ///Returns a DateTime picker Widget.
   Future myTimePicker({required context}) async {
     var time = await showTimePicker(
         builder: (context, child) => MediaQuery(
@@ -92,6 +123,7 @@ class DbController extends GetxController {
     return time;
   }
 
+  ///Return a String value for storing in database from Datetime object.
   static String habbitListKey(DateTime date) {
     String year = date.year.toString();
     String month =
@@ -102,6 +134,7 @@ class DbController extends GetxController {
     return year + month + day;
   }
 
+  ///Converts DateTime object from String value containing date.
   static habbitListKeytoDateTime(String date) {
     int year = int.parse(date.substring(0, 4));
     int month = int.parse(date.substring(4, 6));
@@ -110,6 +143,7 @@ class DbController extends GetxController {
     return DateTime(year, month, day);
   }
 
+  ///Action to perform on Habit play/pause button tap
   habitOnTap({required int index}) async {
     double totalTime = habitList[index].totalHabbitTime!;
 
@@ -154,9 +188,15 @@ class DbController extends GetxController {
         if (habitList[index].running == false) {
           // print(
           //     'time running: ${habitList[index].elapsedTime.toStringAsFixed(2)}');
-          await box.put(
-              BoxConstants.habitListKeyText + habbitListKey(DateTime.now()),
-              habitList);
+          _user != null
+              ? await firestore.doc(CloudConstants.docName + _user.uid).set(
+                  toMap(
+                      CloudConstants.habitListKeyText +
+                          habbitListKey(DateTime.now()),
+                      habitListToMap(habitList)))
+              : await box.put(
+                  BoxConstants.habitListKeyText + habbitListKey(DateTime.now()),
+                  habitList);
           timer.cancel();
           update();
         } else if (habitList[index].initialHabbitTime! +
@@ -168,12 +208,20 @@ class DbController extends GetxController {
           habitList[index].completed = true;
 
           // show notification
+          notifyHabit();
+
           percentCompleted();
           loadHeatMap();
           update();
-          await box.put(
-              BoxConstants.habitListKeyText + habbitListKey(DateTime.now()),
-              habitList);
+          _user != null
+              ? await firestore.doc(CloudConstants.docName + _user.uid).set(
+                  toMap(
+                      CloudConstants.habitListKeyText +
+                          habbitListKey(DateTime.now()),
+                      habitListToMap(habitList)))
+              : await box.put(
+                  BoxConstants.habitListKeyText + habbitListKey(DateTime.now()),
+                  habitList);
           print('list updated');
           timer.cancel();
           Get.rawSnackbar(message: 'Habbit completed');
@@ -190,6 +238,17 @@ class DbController extends GetxController {
     }
   }
 
+  ///Notifies when a habit is Compeleted.
+  void notifyHabit() {
+    AwesomeNotifications().createNotification(
+        content: NotificationContent(
+            id: 1,
+            channelKey: 'Habit-Completed',
+            title: 'Habit Completed',
+            body: 'Congrats!, you have sucessfully completed a habit'));
+  }
+
+  ///Percentage completed of each day Habit List for Heatmap
   Future<void> percentCompleted() async {
     double completed = 0.0;
     for (int i = 0; i < habitList.length; i++) {
@@ -199,18 +258,24 @@ class DbController extends GetxController {
     }
     double percentSummary =
         habitList.isNotEmpty ? completed / habitList.length : 0.0;
-    await box.put(BoxConstants.habitSummaryText + habbitListKey(DateTime.now()),
-        percentSummary);
+    _user != null
+        ? await firestore.doc(CloudConstants.docName + _user.uid).set(toMap(
+            CloudConstants.habitSummaryText + habbitListKey(DateTime.now()),
+            percentSummary))
+        : await box.put(
+            BoxConstants.habitSummaryText + habbitListKey(DateTime.now()),
+            percentSummary);
     print('Percent completed: $percentSummary');
   }
 
+  ///Heatmap enteries for graph
   void loadHeatMap() async {
     DateTime date = habbitListKeytoDateTime(box.get(BoxConstants.startDateKey));
 
     int dayInBW = DateTime.now().difference(date).inDays;
     for (int i = 0; i <= dayInBW; i++) {
       double strength =
-          box.get(BoxConstants.habitSummaryText + habbitListKey(date)) ?? 0.0;
+          box.get(BoxConstants.habitSummaryText + habbitListKey(date)) ?? 0;
 
       int year = date.year;
       int month = date.month;

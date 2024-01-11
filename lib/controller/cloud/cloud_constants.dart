@@ -1,5 +1,6 @@
 class CloudConstants {
-  static const String habitList = 'Habit-List';
+  static const habitListKeyText = 'HabitList-day:';
+  static const habitSummaryText = 'Habit-Summary';
   static const String collections = 'User-Habit-Data';
   static const String docName = 'user-uid:';
 }

@@ -163,11 +163,12 @@ class _HabitTileState extends State<HabitTile> {
                                                       padding: const EdgeInsets
                                                           .symmetric(
                                                           horizontal: 16),
-                                                      onPressed: () {
+                                                      onPressed: () async {
                                                         setState(() {
                                                           db.habitList
                                                               .removeAt(index);
                                                         });
+                                                        db.saveUpdatedList();
                                                         navigator!.pop();
                                                       },
                                                       icon:
