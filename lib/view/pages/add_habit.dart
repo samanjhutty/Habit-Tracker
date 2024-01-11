@@ -35,9 +35,9 @@ class _AddHabitState extends State<AddHabit> {
     if (widget.data != null && widget.index != null) {
       var totalTime = widget.data!.totalHabbitTime;
 
-      nameController.text = widget.data!.title;
-      time = timedb.doubleToTimeOfDay(totalTime);
-      isStarted = widget.data!.running;
+      nameController.text = widget.data!.title!;
+      time = timedb.doubleToTimeOfDay(totalTime!);
+      isStarted = widget.data!.running!;
     }
     timeController.text = timedb.formatedDateTimeObj(time!);
 
@@ -158,13 +158,13 @@ class _AddHabitState extends State<AddHabit> {
                                             index: widget.index!,
                                             title: nameController.text,
                                             elapsedTime:
-                                                widget.data!.elapsedTime,
+                                                widget.data!.elapsedTime!,
                                             initilTime:
-                                                widget.data!.initialHabbitTime,
+                                                widget.data!.initialHabbitTime!,
                                             totalTime: time != null
                                                 ? timedb
                                                     .timeOfDayToDouble(time!)
-                                                : widget.data!.totalHabbitTime,
+                                                : widget.data!.totalHabbitTime!,
                                             listDayKey:
                                                 BoxConstants.habitListKeyText +
                                                     DbController.habbitListKey(

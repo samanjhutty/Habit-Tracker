@@ -1,9 +1,11 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:habit_tracker/controller/cloud/profile_controller.dart';
-import 'package:habit_tracker/controller/cloud/signin_controller.dart';
-import 'package:habit_tracker/controller/cloud/signup_controller.dart';
+import 'package:habit_tracker/controller/cloud/auth/profile_controller.dart';
+import 'package:habit_tracker/controller/cloud/auth/signin_controller.dart';
+import 'package:habit_tracker/controller/cloud/auth/signup_controller.dart';
+import 'package:habit_tracker/controller/db_controller.dart';
 import 'package:habit_tracker/controller/local/db_constants.dart';
 import 'package:provider/provider.dart';
 
@@ -17,6 +19,8 @@ class UserProfile extends StatefulWidget {
 class _UserProfileState extends State<UserProfile>
     with TickerProviderStateMixin {
   FirebaseAuth auth = FirebaseAuth.instance;
+  FirebaseFirestore firestore = FirebaseFirestore.instance;
+  DbController db = Get.find();
   Color? appThemeColor;
   bool? selected = false;
 
@@ -149,7 +153,7 @@ class _UserProfileState extends State<UserProfile>
                                                     print(appThemeColor);
                                                     box.put(
                                                         BoxConstants
-                                                            .appThemeColor,
+                                                            .appThemeColorValue,
                                                         appThemeColor!.value);
                                                     Get.rawSnackbar(
                                                         message:
@@ -297,11 +301,7 @@ class _UserProfileState extends State<UserProfile>
                                             shape: RoundedRectangleBorder(
                                                 borderRadius:
                                                     BorderRadius.circular(8))),
-                                        onPressed: () {
-                                          for (var values in box.values) {
-                                            print(values);
-                                          }
-                                        },
+                                        onPressed: () => db.syncToCloud(),
                                         label: const Text('Sync'),
                                         icon: const Icon(Icons.sync),
                                       ),

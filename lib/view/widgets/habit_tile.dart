@@ -54,11 +54,11 @@ class _HabitTileState extends State<HabitTile> {
                         }
 
                         double percentCompleted =
-                            (list.initialHabbitTime + list.elapsedTime) /
-                                list.totalHabbitTime;
+                            (list.initialHabbitTime! + list.elapsedTime!) /
+                                list.totalHabbitTime!;
 
-                        double initialTime = list.totalHabbitTime -
-                            (list.initialHabbitTime + list.elapsedTime);
+                        double initialTime = list.totalHabbitTime! -
+                            (list.initialHabbitTime! + list.elapsedTime!);
 
                         db.percentCompleted();
                         db.loadHeatMap();
@@ -96,7 +96,7 @@ class _HabitTileState extends State<HabitTile> {
                                     ),
                                   ),
                                 ),
-                                title: Text(list.title,
+                                title: Text(list.title!,
                                     style: const TextStyle(
                                         fontWeight: FontWeight.w600,
                                         fontSize: 20)),
@@ -106,9 +106,9 @@ class _HabitTileState extends State<HabitTile> {
                                       ? '${timedb.formatedTime((initialTime / 60).floor(), (initialTime - 60).ceil())} hrs'
                                       : '${initialTime.ceil()} min';
 
-                                  String totalTime = list.totalHabbitTime > 60
-                                      ? '${timedb.formatedTime((list.totalHabbitTime / 60).floor(), (list.totalHabbitTime - 60).ceil())} hrs'
-                                      : '${list.totalHabbitTime.ceil()} min';
+                                  String totalTime = list.totalHabbitTime! > 60
+                                      ? '${timedb.formatedTime((list.totalHabbitTime! / 60).floor(), (list.totalHabbitTime! - 60).ceil())} hrs'
+                                      : '${list.totalHabbitTime!.ceil()} min';
 
                                   return Text(
                                       'Remaining  $remainingInitialTime / $totalTime',

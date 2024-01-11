@@ -1,12 +1,15 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:provider/provider.dart';
-import 'assets/assets.dart';
+import 'assets/asset_widgets.dart';
 import 'controller/bindings.dart';
-import 'controller/cloud/profile_controller.dart';
-import 'controller/cloud/signin_controller.dart';
-import 'controller/cloud/signup_controller.dart';
+import 'controller/cloud/auth/profile_controller.dart';
+import 'controller/cloud/auth/signin_controller.dart';
+import 'controller/cloud/auth/signup_controller.dart';
+import 'controller/cloud/cloud_constants.dart';
 import 'controller/local/db_constants.dart';
 import 'controller/db_controller.dart';
 import 'model/habit_model.dart';
@@ -39,8 +42,8 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    Color color = Color(
-        box.get(BoxConstants.appThemeColor) ?? const Color(0xFFFB5B76).value);
+    Color color = Color(box.get(BoxConstants.appThemeColorValue) ??
+        const Color(0xFFFB5B76).value);
     return MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (context) => ProfileController()),
@@ -89,6 +92,7 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
   late TabController _tabController;
   DbController dbController = Get.find();
+  User? user = FirebaseAuth.instance.currentUser;
 
   final List<Tab> _tabs = [
     const Tab(text: 'Home'),
@@ -102,7 +106,7 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
       box.put(BoxConstants.startDateKey,
           DbController.habbitListKey(DateTime.now()));
     }
-    _getList();
+    user != null ? _getCloudList() : _getList();
     super.initState();
   }
 
@@ -111,10 +115,27 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
             DbController.habbitListKey(DateTime.now())) ??
         <HabitModel>[];
 
-    List localList = list..map((e) => e as HabitModel).toList();
+    List localList = list.map((e) => e as HabitModel).toList();
     setState(() {
       dbController.habitList = localList.cast<HabitModel>();
     });
+  }
+
+  _getCloudList() async {
+    FirebaseFirestore firestore = FirebaseFirestore.instance;
+    try {
+      var map = await firestore
+          .collection(CloudConstants.collections)
+          .doc(CloudConstants.docName + user!.uid)
+          .get();
+
+      print(map.exists
+          ? map.get(CloudConstants.habitList +
+              DbController.habbitListKey(DateTime.now()))
+          : []);
+    } catch (e) {
+      print('Unexpected error:$e');
+    }
   }
 
   @override

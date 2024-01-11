@@ -1,15 +1,41 @@
 import 'dart:async';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:habit_tracker/controller/cloud/cloud_constants.dart';
 import 'package:habit_tracker/controller/local/db_constants.dart';
 import 'package:habit_tracker/model/habit_model.dart';
 
 class DbController extends GetxController {
   List<HabitModel> habitList = <HabitModel>[];
   Map<DateTime, int> heatMapDataset = {};
+  final firestore =
+      FirebaseFirestore.instance.collection(CloudConstants.collections);
+  final User? _user = FirebaseAuth.instance.currentUser;
 
   void refreshdb() => update();
+
+  void syncToCloud() {
+    for (var values in box.values) {
+      firestore.add(values);
+      print(values);
+    }
+  }
+
+  Map<String, dynamic> toMap(String key, dynamic data) => {key: data};
+
+  List<Map<String, dynamic>> habitListToMap(List<HabitModel> habitList) {
+    List<Map<String, dynamic>> mapList = [];
+    for (HabitModel element in habitList) {
+      Map<String, dynamic> map = element.toMap();
+      mapList.add(map);
+    }
+
+    return mapList;
+  }
+
   newHabit(
       {required String title,
       required double totalTime,
@@ -21,9 +47,14 @@ class DbController extends GetxController {
         totalHabbitTime: totalTime,
         running: isStart,
         completed: false));
-    await box.put(BoxConstants.habitListKeyText + habbitListKey(DateTime.now()),
-        habitList);
-    print('habit added');
+    _user != null
+        ? await firestore.doc(CloudConstants.docName + _user.uid).set(toMap(
+            CloudConstants.habitList + habbitListKey(DateTime.now()),
+            habitListToMap(habitList)))
+        : await box.put(
+            BoxConstants.habitListKeyText + habbitListKey(DateTime.now()),
+            habitList);
+    print('habit added ${_user?.uid ?? ''}');
     update();
   }
 
@@ -80,15 +111,16 @@ class DbController extends GetxController {
   }
 
   habitOnTap({required int index}) async {
-    double totalTime = habitList[index].totalHabbitTime;
+    double totalTime = habitList[index].totalHabbitTime!;
 
-    habitList[index].running = !habitList[index].running;
+    habitList[index].running = !habitList[index].running!;
     // update();  //show a bug(timer goes forward and back to previous)
-    if (habitList[index].running) {
-      habitList[index].elapsedTime += habitList[index].initialHabbitTime;
+    if (habitList[index].running!) {
+      habitList[index].elapsedTime =
+          habitList[index].elapsedTime! + habitList[index].initialHabbitTime!;
     }
 
-    if (habitList[index].initialHabbitTime + habitList[index].elapsedTime >=
+    if (habitList[index].initialHabbitTime! + habitList[index].elapsedTime! >=
         totalTime) {
       habitList[index].running = false;
       showDialog(
@@ -117,7 +149,7 @@ class DbController extends GetxController {
     }
     DateTime time = DateTime.now();
     print('completed: ${habitList[index].completed}');
-    if (habitList[index].running) {
+    if (habitList[index].running!) {
       Timer.periodic(const Duration(seconds: 1), (Timer timer) async {
         if (habitList[index].running == false) {
           // print(
@@ -127,8 +159,8 @@ class DbController extends GetxController {
               habitList);
           timer.cancel();
           update();
-        } else if (habitList[index].initialHabbitTime +
-                    habitList[index].elapsedTime >=
+        } else if (habitList[index].initialHabbitTime! +
+                    habitList[index].elapsedTime! >=
                 totalTime ||
             habitList[index].completed == true) {
           habitList[index].initialHabbitTime = habitList[index].totalHabbitTime;
@@ -188,7 +220,6 @@ class DbController extends GetxController {
       };
 
       heatMapDataset.addEntries(summary.entries);
-      print('loop ran, entries: ${heatMapDataset.entries}');
       date = date.add(const Duration(days: 1));
     }
   }

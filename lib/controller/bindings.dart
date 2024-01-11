@@ -1,6 +1,6 @@
 import 'package:get/get.dart';
-import '../assets/assets.dart';
-import 'cloud/profile_controller.dart';
+import '../assets/asset_widgets.dart';
+import 'cloud/auth/profile_controller.dart';
 import 'db_controller.dart';
 import 'time_controller.dart';
 

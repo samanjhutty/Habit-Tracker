@@ -3,8 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:otp_text_field/otp_field.dart';
 import 'package:otp_text_field/style.dart';
 import 'package:provider/provider.dart';
-import '../../assets/assets.dart';
-import '../../controller/cloud/signup_controller.dart';
+import '../../../assets/asset_widgets.dart';
+import '../../controller/cloud/auth/signup_controller.dart';
 
 class OTPPage extends StatefulWidget {
   const OTPPage({super.key});

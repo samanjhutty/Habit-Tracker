@@ -17,12 +17,12 @@ class HabitModelAdapter extends TypeAdapter<HabitModel> {
       for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
     };
     return HabitModel(
-      title: fields[0] as String,
-      initialHabbitTime: fields[1] as double,
-      elapsedTime: fields[2] as double,
-      totalHabbitTime: fields[3] as double,
-      running: fields[4] as bool,
-      completed: fields[5] as bool,
+      title: fields[0] as String?,
+      initialHabbitTime: fields[1] as double?,
+      elapsedTime: fields[2] as double?,
+      totalHabbitTime: fields[3] as double?,
+      running: fields[4] as bool?,
+      completed: fields[5] as bool?,
     );
   }
 

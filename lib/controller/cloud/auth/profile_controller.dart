@@ -5,7 +5,7 @@ import 'package:firebase_storage/firebase_storage.dart' as storage;
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import '../../assets/assets.dart';
+import '../../../assets/asset_widgets.dart';
 
 class ProfileController with ChangeNotifier {
   MyWidgets widgets = Get.find();

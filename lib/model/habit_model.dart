@@ -12,20 +12,40 @@ class HabitModel {
       required this.completed});
 
   @HiveField(0)
-  String title;
+  String? title;
 
   @HiveField(1)
-  double initialHabbitTime;
+  double? initialHabbitTime;
 
   @HiveField(2)
-  double elapsedTime;
+  double? elapsedTime;
 
   @HiveField(3)
-  double totalHabbitTime;
+  double? totalHabbitTime;
 
   @HiveField(4)
-  bool running;
+  bool? running;
 
   @HiveField(5)
-  bool completed;
+  bool? completed;
+
+  Map<String, dynamic> toMap() {
+    final Map<String, dynamic> map = <String, dynamic>{};
+    map['title'] = title;
+    map['initialHabbitTime'] = initialHabbitTime;
+    map['elapsedTime'] = elapsedTime;
+    map['totalHabbitTime'] = totalHabbitTime;
+    map['running'] = running;
+    map['completed'] = completed;
+    return map;
+  }
+
+  HabitModel.fromMap(Map<String, dynamic> map) {
+    title = map['title'];
+    initialHabbitTime = map['initialHabbitTime'];
+    elapsedTime = map['elapsedTime'];
+    totalHabbitTime = map['totalHabbitTime'];
+    running = map['running'];
+    completed = map['completed'] ?? false;
+  }
 }
