@@ -6,7 +6,6 @@ import 'package:habit_tracker/controller/cloud/auth/profile_controller.dart';
 import 'package:habit_tracker/controller/cloud/auth/signin_controller.dart';
 import 'package:habit_tracker/controller/cloud/auth/signup_controller.dart';
 import 'package:habit_tracker/controller/db_controller.dart';
-import 'package:habit_tracker/controller/local/db_constants.dart';
 import 'package:provider/provider.dart';
 
 class UserProfile extends StatefulWidget {
@@ -21,8 +20,7 @@ class _UserProfileState extends State<UserProfile>
   FirebaseAuth auth = FirebaseAuth.instance;
   FirebaseFirestore firestore = FirebaseFirestore.instance;
   DbController db = Get.find();
-  Color? appThemeColor;
-  bool? selected = false;
+  Color appThemeColor = const Color(0xFFFB5B76);
 
   @override
   Widget build(BuildContext context) {
@@ -137,156 +135,162 @@ class _UserProfileState extends State<UserProfile>
                                             shape: RoundedRectangleBorder(
                                                 borderRadius:
                                                     BorderRadius.circular(8))),
-                                        onPressed: () => showBottomSheet(
+                                        onPressed: () => showModalBottomSheet(
                                             context: context,
                                             builder: (context) {
                                               return BottomSheet(
-                                                  backgroundColor:
-                                                      scheme.secondary,
-                                                  showDragHandle: true,
-                                                  animationController:
-                                                      AnimationController(
-                                                          vsync: this),
-                                                  onClosing: () {
-                                                    appThemeColor ??=
-                                                        const Color(0xFFFB5B76);
-                                                    print(appThemeColor);
-                                                    box.put(
-                                                        BoxConstants
-                                                            .appThemeColorValue,
-                                                        appThemeColor!.value);
-                                                    Get.rawSnackbar(
-                                                        message:
-                                                            'Please restart app to see changes.');
-                                                  },
-                                                  builder: ((context) => Column(
-                                                        mainAxisSize:
-                                                            MainAxisSize.min,
+                                                animationController: BottomSheet
+                                                    .createAnimationController(
+                                                        this),
+                                                showDragHandle: true,
+                                                onClosing: () {},
+                                                builder: (context) => Column(
+                                                  mainAxisSize:
+                                                      MainAxisSize.min,
+                                                  children: [
+                                                    RadioListTile(
+                                                      value: const Color(
+                                                          0xFFFB5B76),
+                                                      groupValue: appThemeColor,
+                                                      onChanged: (value) {
+                                                        setState(() {
+                                                          appThemeColor =
+                                                              value!;
+                                                        });
+                                                      },
+                                                      title: Row(
+                                                        mainAxisAlignment:
+                                                            MainAxisAlignment
+                                                                .spaceBetween,
                                                         children: [
-                                                          RadioListTile(
-                                                            value: selected!,
-                                                            groupValue:
-                                                                selected!,
-                                                            onChanged: (value) {
-                                                              setState(() {
-                                                                selected =
-                                                                    value;
-                                                              });
-
-                                                              appThemeColor =
-                                                                  const Color(
-                                                                      0xFFFB5B76);
-                                                            },
-                                                            title: Row(
-                                                              mainAxisAlignment:
-                                                                  MainAxisAlignment
-                                                                      .spaceBetween,
-                                                              children: [
-                                                                const Text(
-                                                                    'Default'),
-                                                                Container(
-                                                                  decoration: BoxDecoration(
-                                                                      color: scheme
-                                                                          .secondary,
-                                                                      shape: BoxShape
-                                                                          .circle),
-                                                                  padding:
-                                                                      const EdgeInsets
-                                                                          .all(
-                                                                          4),
-                                                                  child:
-                                                                      const CircleAvatar(
-                                                                    radius: 16,
-                                                                    backgroundColor:
-                                                                        Color(
-                                                                            0xFFFB5B76),
-                                                                  ),
-                                                                )
-                                                              ],
-                                                            ),
-                                                          ),
-                                                          RadioListTile(
-                                                            value: selected!,
-                                                            groupValue:
-                                                                !selected!,
-                                                            onChanged: (value) {
-                                                              setState(() {
-                                                                selected =
-                                                                    value;
-                                                              });
-                                                              appThemeColor = Colors
-                                                                  .lightGreenAccent;
-                                                            },
-                                                            title: Row(
-                                                              mainAxisAlignment:
-                                                                  MainAxisAlignment
-                                                                      .spaceBetween,
-                                                              children: [
-                                                                const Text(
-                                                                    'Light Green'),
-                                                                Container(
-                                                                  decoration: BoxDecoration(
-                                                                      color: scheme
-                                                                          .secondary,
-                                                                      shape: BoxShape
-                                                                          .circle),
-                                                                  padding:
-                                                                      const EdgeInsets
-                                                                          .all(
-                                                                          4),
-                                                                  child:
-                                                                      const CircleAvatar(
-                                                                    radius: 16,
-                                                                    backgroundColor:
-                                                                        Colors
-                                                                            .lightGreenAccent,
-                                                                  ),
-                                                                )
-                                                              ],
-                                                            ),
-                                                          ),
-                                                          RadioListTile(
-                                                            value: selected!,
-                                                            groupValue:
-                                                                !selected!,
-                                                            onChanged: (value) {
-                                                              setState(() {
-                                                                selected =
-                                                                    value;
-                                                              });
-                                                              appThemeColor = Colors
-                                                                  .lightBlueAccent;
-                                                            },
-                                                            title: Row(
-                                                              mainAxisAlignment:
-                                                                  MainAxisAlignment
-                                                                      .spaceBetween,
-                                                              children: [
-                                                                const Text(
-                                                                    'Light Blue'),
-                                                                Container(
-                                                                  decoration: BoxDecoration(
-                                                                      color: scheme
-                                                                          .secondary,
-                                                                      shape: BoxShape
-                                                                          .circle),
-                                                                  padding:
-                                                                      const EdgeInsets
-                                                                          .all(
-                                                                          4),
-                                                                  child:
-                                                                      const CircleAvatar(
-                                                                    radius: 16,
-                                                                    backgroundColor:
-                                                                        Colors
-                                                                            .lightBlueAccent,
-                                                                  ),
-                                                                )
-                                                              ],
+                                                          const Text('Default'),
+                                                          Container(
+                                                            decoration: BoxDecoration(
+                                                                color: scheme
+                                                                    .secondary,
+                                                                shape: BoxShape
+                                                                    .circle),
+                                                            padding:
+                                                                const EdgeInsets
+                                                                    .all(4),
+                                                            child:
+                                                                const CircleAvatar(
+                                                              radius: 16,
+                                                              backgroundColor:
+                                                                  Color(
+                                                                      0xFFFB5B76),
                                                             ),
                                                           )
                                                         ],
-                                                      )));
+                                                      ),
+                                                    ),
+                                                    RadioListTile(
+                                                      value: Colors
+                                                          .lightGreenAccent,
+                                                      groupValue: appThemeColor,
+                                                      onChanged: (value) {
+                                                        setState(() {
+                                                          appThemeColor =
+                                                              value!;
+                                                        });
+                                                      },
+                                                      title: Row(
+                                                        mainAxisAlignment:
+                                                            MainAxisAlignment
+                                                                .spaceBetween,
+                                                        children: [
+                                                          const Text(
+                                                              'Light Green'),
+                                                          Container(
+                                                            decoration: BoxDecoration(
+                                                                color: scheme
+                                                                    .secondary,
+                                                                shape: BoxShape
+                                                                    .circle),
+                                                            padding:
+                                                                const EdgeInsets
+                                                                    .all(4),
+                                                            child:
+                                                                const CircleAvatar(
+                                                              radius: 16,
+                                                              backgroundColor:
+                                                                  Colors
+                                                                      .lightGreenAccent,
+                                                            ),
+                                                          )
+                                                        ],
+                                                      ),
+                                                    ),
+                                                    RadioListTile(
+                                                      value: Colors
+                                                          .lightBlueAccent,
+                                                      groupValue: appThemeColor,
+                                                      onChanged: (value) {
+                                                        setState(() {
+                                                          appThemeColor =
+                                                              value!;
+                                                        });
+                                                      },
+                                                      title: Row(
+                                                        mainAxisAlignment:
+                                                            MainAxisAlignment
+                                                                .spaceBetween,
+                                                        children: [
+                                                          const Text(
+                                                              'Light Blue'),
+                                                          Container(
+                                                            decoration: BoxDecoration(
+                                                                color: scheme
+                                                                    .secondary,
+                                                                shape: BoxShape
+                                                                    .circle),
+                                                            padding:
+                                                                const EdgeInsets
+                                                                    .all(4),
+                                                            child:
+                                                                const CircleAvatar(
+                                                              radius: 16,
+                                                              backgroundColor:
+                                                                  Colors
+                                                                      .lightBlueAccent,
+                                                            ),
+                                                          )
+                                                        ],
+                                                      ),
+                                                    ),
+                                                    Padding(
+                                                      padding:
+                                                          const EdgeInsets.all(
+                                                              8),
+                                                      child: Row(
+                                                        mainAxisAlignment:
+                                                            MainAxisAlignment
+                                                                .end,
+                                                        children: [
+                                                          ElevatedButton.icon(
+                                                              style: ElevatedButton.styleFrom(
+                                                                  backgroundColor:
+                                                                      scheme
+                                                                          .primary,
+                                                                  foregroundColor:
+                                                                      scheme
+                                                                          .onPrimary),
+                                                              onPressed: () {
+                                                                navigator!
+                                                                    .pop();
+                                                                db.changeTheme(
+                                                                    appThemeColor);
+                                                              },
+                                                              label: const Text(
+                                                                  'Save'),
+                                                              icon: const Icon(
+                                                                  Icons.check))
+                                                        ],
+                                                      ),
+                                                    )
+                                                  ],
+                                                ),
+                                              );
                                             }),
                                         label: const Text('Theme'),
                                         icon: const Icon(Icons.color_lens),

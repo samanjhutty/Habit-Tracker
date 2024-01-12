@@ -128,14 +128,18 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
   }
 
   _getList() async {
-    List list = await box.get(BoxConstants.habitListKeyText +
-            DbController.habbitListKey(DateTime.now())) ??
-        <HabitModel>[];
+    try {
+      List list = await box.get(BoxConstants.habitListKeyText +
+              DbController.habbitListKey(DateTime.now())) ??
+          <HabitModel>[];
 
-    List localList = list.map((e) => e as HabitModel).toList();
-    setState(() {
-      dbController.habitList = localList.cast<HabitModel>();
-    });
+      List localList = list.map((e) => e as HabitModel).toList();
+      setState(() {
+        dbController.habitList = localList.cast<HabitModel>();
+      });
+    } catch (e) {
+      print('Unexpected error occured: $e');
+    }
   }
 
   _getCloudList() async {
@@ -145,11 +149,11 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
           .collection(CloudConstants.collections)
           .doc(CloudConstants.docName + user!.uid)
           .get();
-      List map = snapshot.get(CloudConstants.habitListKeyText +
+      List dataMap = snapshot.get(CloudConstants.habitListKeyText +
           DbController.habbitListKey(DateTime.now()));
 
       List<Map<String, dynamic>> habitListMap =
-          map.cast<Map<String, dynamic>>();
+          dataMap.cast<Map<String, dynamic>>();
 
       for (var element in habitListMap) {
         dbController.habitList.add(HabitModel.fromMap(element));
@@ -157,7 +161,7 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
       Future.delayed(const Duration(milliseconds: 1))
           .then((value) => setState(() {}));
     } catch (e) {
-      print('Unexpected error:$e');
+      print('Unexpected error occured: $e');
     }
   }
 

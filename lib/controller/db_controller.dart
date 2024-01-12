@@ -16,7 +16,10 @@ class DbController extends GetxController {
       FirebaseFirestore.instance.collection(CloudConstants.collections);
   final User? _user = FirebaseAuth.instance.currentUser;
 
-  void refreshdb() => update();
+  void changeTheme(Color themeColor) {
+    box.put(BoxConstants.appThemeColorValue, themeColor.value);
+    update();
+  }
 
   ///Save all the local saved values to Cloud Firestore.
   void syncToCloud() async {

@@ -49,7 +49,6 @@ class _HabitTileState extends State<HabitTile> {
                     : GetBuilder<DbController>(builder: (db) {
                         HabitModel list = db.habitList[index];
                         if (list.completed == true) {
-                          print('completed');
                           list.initialHabbitTime = list.totalHabbitTime;
                         }
 
