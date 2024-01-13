@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:percent_indicator/percent_indicator.dart';
+import 'package:provider/provider.dart';
 import '../../controller/db_controller.dart';
 import '../../controller/time_controller.dart';
 import '../../model/habit_model.dart';
@@ -14,8 +15,6 @@ class HabitTile extends StatefulWidget {
 }
 
 class _HabitTileState extends State<HabitTile> {
-  DbController controller = Get.find();
-
   @override
   Widget build(BuildContext context) {
     ColorScheme scheme = Theme.of(context).colorScheme;
@@ -34,9 +33,9 @@ class _HabitTileState extends State<HabitTile> {
         ),
         Expanded(
           child: ListView.builder(
-              itemCount: controller.habitList.length,
+              itemCount: context.watch<DbController>().habitList.length,
               itemBuilder: ((context, index) {
-                return controller.habitList.isEmpty
+                return context.watch<DbController>().habitList.isEmpty
                     ? const Center(
                         child: Text(
                           "No habbit maintained, let's build a new one!",
@@ -46,7 +45,7 @@ class _HabitTileState extends State<HabitTile> {
                           ),
                         ),
                       )
-                    : GetBuilder<DbController>(builder: (db) {
+                    : Consumer<DbController>(builder: (context, db, child) {
                         HabitModel list = db.habitList[index];
                         if (list.completed == true) {
                           list.initialHabbitTime = list.totalHabbitTime;
@@ -58,6 +57,14 @@ class _HabitTileState extends State<HabitTile> {
 
                         double initialTime = list.totalHabbitTime! -
                             (list.initialHabbitTime! + list.elapsedTime!);
+
+                        String remainingInitialTime = initialTime > 60
+                            ? '${TimeController().formatedTime((initialTime / 60).floor(), (initialTime - 60).ceil())} hrs'
+                            : '${initialTime.ceil()} min';
+
+                        String totalTime = list.totalHabbitTime! > 60
+                            ? '${TimeController().formatedTime((list.totalHabbitTime! / 60).floor(), (list.totalHabbitTime! - 60).ceil())} hrs'
+                            : '${list.totalHabbitTime!.ceil()} min';
 
                         db.percentCompleted();
                         db.loadHeatMap();
@@ -99,21 +106,10 @@ class _HabitTileState extends State<HabitTile> {
                                     style: const TextStyle(
                                         fontWeight: FontWeight.w600,
                                         fontSize: 20)),
-                                subtitle: GetBuilder<TimeController>(
-                                    builder: (timedb) {
-                                  String remainingInitialTime = initialTime > 60
-                                      ? '${timedb.formatedTime((initialTime / 60).floor(), (initialTime - 60).ceil())} hrs'
-                                      : '${initialTime.ceil()} min';
-
-                                  String totalTime = list.totalHabbitTime! > 60
-                                      ? '${timedb.formatedTime((list.totalHabbitTime! / 60).floor(), (list.totalHabbitTime! - 60).ceil())} hrs'
-                                      : '${list.totalHabbitTime!.ceil()} min';
-
-                                  return Text(
-                                      'Remaining  $remainingInitialTime / $totalTime',
-                                      style: const TextStyle(
-                                          color: Colors.grey, fontSize: 12));
-                                }),
+                                subtitle: Text(
+                                    'Remaining  $remainingInitialTime / $totalTime',
+                                    style: const TextStyle(
+                                        color: Colors.grey, fontSize: 12)),
                                 trailing: PopupMenuButton(
                                   tooltip: 'Settings',
                                   position: PopupMenuPosition.under,

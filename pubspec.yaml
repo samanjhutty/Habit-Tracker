@@ -36,7 +36,6 @@ dependencies:
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.2
   firebase_core: ^2.24.2
-  get: ^4.6.6
   percent_indicator: ^4.2.3
   hive: 
   hive_flutter: 

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:provider/provider.dart';
 import '../../controller/db_controller.dart';
 import '../widgets/habit_tile.dart';
 import '../widgets/month_summary.dart';
@@ -15,7 +16,6 @@ class MyHomeTab extends StatefulWidget {
 
 class _MyHomeTabState extends State<MyHomeTab> {
   DateTime? startDate;
-  DbController dbController = Get.find();
 
   @override
   void initState() {
@@ -39,7 +39,7 @@ class _MyHomeTabState extends State<MyHomeTab> {
             preferredSize: Size.fromHeight(graphHeight),
             child: SizedBox(
               height: graphHeight,
-              child: GetBuilder<DbController>(builder: (db) {
+              child: Consumer<DbController>(builder: (context, db, child) {
                 return MonthSummary(
                   startDate: startDate!,
                   dataset: db.heatMapDataset,

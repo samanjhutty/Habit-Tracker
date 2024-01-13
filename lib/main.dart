@@ -2,11 +2,9 @@ import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:provider/provider.dart';
 import 'assets/asset_widgets.dart';
-import 'controller/bindings.dart';
 import 'controller/cloud/auth/profile_controller.dart';
 import 'controller/cloud/auth/signin_controller.dart';
 import 'controller/cloud/auth/signup_controller.dart';
@@ -59,10 +57,10 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(create: (context) => ProfileController()),
         ChangeNotifierProvider(create: (context) => SignUpAuth()),
         ChangeNotifierProvider(create: (context) => SignInAuth()),
-        ChangeNotifierProvider(create: (context) => MyWidgets())
+        ChangeNotifierProvider(create: (context) => MyWidgets()),
+        ChangeNotifierProvider(create: (context) => DbController())
       ],
       child: GetMaterialApp(
-        initialBinding: ControllerBinding(),
         routes: {
           '/': (p0) => const MyHomePage(),
           '/user': (p0) => const UserProfile(),
@@ -101,7 +99,6 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
   late TabController _tabController;
-  DbController dbController = Get.find();
   User? user = FirebaseAuth.instance.currentUser;
 
   final List<Tab> _tabs = [
@@ -135,7 +132,7 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
 
       List localList = list.map((e) => e as HabitModel).toList();
       setState(() {
-        dbController.habitList = localList.cast<HabitModel>();
+        context.read<DbController>().habitList = localList.cast<HabitModel>();
       });
     } catch (e) {
       print('Unexpected error occured: $e');
@@ -156,7 +153,12 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
           dataMap.cast<Map<String, dynamic>>();
 
       for (var element in habitListMap) {
-        dbController.habitList.add(HabitModel.fromMap(element));
+        setState(() {
+          context
+              .read<DbController>()
+              .habitList
+              .add(HabitModel.fromMap(element));
+        });
       }
       Future.delayed(const Duration(milliseconds: 1))
           .then((value) => setState(() {}));

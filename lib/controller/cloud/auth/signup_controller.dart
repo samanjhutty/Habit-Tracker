@@ -5,7 +5,7 @@ import 'profile_controller.dart';
 
 class SignUpAuth extends ChangeNotifier {
   final FirebaseAuth _auth = FirebaseAuth.instance;
-  final ProfileController profile = Get.find();
+  final ProfileController profile = ProfileController();
 
   TextEditingController phone = TextEditingController();
   TextEditingController username = TextEditingController();

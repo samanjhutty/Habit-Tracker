@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-class TimeController extends GetxController {
+class TimeController {
   String formatedDateTimeObj(TimeOfDay time) {
     String hrs =
         time.hour.isLowerThan(10) ? '0${time.hour}' : time.hour.toString();

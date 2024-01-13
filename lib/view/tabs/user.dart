@@ -19,7 +19,6 @@ class _UserProfileState extends State<UserProfile>
     with TickerProviderStateMixin {
   FirebaseAuth auth = FirebaseAuth.instance;
   FirebaseFirestore firestore = FirebaseFirestore.instance;
-  DbController db = Get.find();
   Color appThemeColor = const Color(0xFFFB5B76);
 
   @override
@@ -278,8 +277,11 @@ class _UserProfileState extends State<UserProfile>
                                                               onPressed: () {
                                                                 navigator!
                                                                     .pop();
-                                                                db.changeTheme(
-                                                                    appThemeColor);
+                                                                context
+                                                                    .read<
+                                                                        DbController>()
+                                                                    .changeTheme(
+                                                                        appThemeColor);
                                                               },
                                                               label: const Text(
                                                                   'Save'),

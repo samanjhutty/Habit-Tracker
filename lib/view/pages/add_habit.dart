@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
+import 'package:provider/provider.dart';
 import '../../controller/local/db_constants.dart';
 import '../../controller/db_controller.dart';
 import '../../controller/time_controller.dart';
@@ -26,8 +27,7 @@ class _AddHabitState extends State<AddHabit> {
       ? const TimeOfDay(hour: 0, minute: 1)
       : const TimeOfDay(hour: 1, minute: 0);
 
-  DbController db = Get.find();
-  TimeController timedb = Get.find();
+  TimeController timedb = TimeController();
   bool isStarted = false;
 
   @override
@@ -103,8 +103,9 @@ class _AddHabitState extends State<AddHabit> {
                                 child: TextField(
                                   controller: timeController,
                                   onTap: () async {
-                                    time =
-                                        await db.myTimePicker(context: context);
+                                    time = await context
+                                        .read<DbController>()
+                                        .myTimePicker(context: context);
                                     if (time == null) return;
                                     setState(() {
                                       timeController.text =
@@ -149,29 +150,31 @@ class _AddHabitState extends State<AddHabit> {
                                 onPressed: () {
                                   if (formkey.currentState!.validate()) {
                                     widget.data == null || widget.index == null
-                                        ? db.newHabit(
+                                        ? context.read<DbController>().newHabit(
                                             title: nameController.text,
                                             totalTime:
                                                 timedb.timeOfDayToDouble(time!),
                                             isStart: isStarted)
-                                        : db.updateHabit(
-                                            index: widget.index!,
-                                            title: nameController.text,
-                                            elapsedTime:
-                                                widget.data!.elapsedTime!,
-                                            initilTime:
-                                                widget.data!.initialHabbitTime!,
-                                            totalTime: time != null
-                                                ? timedb
-                                                    .timeOfDayToDouble(time!)
-                                                : widget.data!.totalHabbitTime!,
-                                            listDayKey:
-                                                BoxConstants.habitListKeyText +
+                                        : context
+                                            .read<DbController>()
+                                            .updateHabit(
+                                                index: widget.index!,
+                                                title: nameController.text,
+                                                elapsedTime:
+                                                    widget.data!.elapsedTime!,
+                                                initilTime: widget
+                                                    .data!.initialHabbitTime!,
+                                                totalTime: time != null
+                                                    ? timedb.timeOfDayToDouble(
+                                                        time!)
+                                                    : widget
+                                                        .data!.totalHabbitTime!,
+                                                listDayKey: BoxConstants
+                                                        .habitListKeyText +
                                                     DbController.habbitListKey(
                                                         DateTime.now()),
-                                            isStart: isStarted);
+                                                isStart: isStarted);
                                     Navigator.pop(context);
-                                    db.update();
                                   }
                                 },
                                 style: ElevatedButton.styleFrom(

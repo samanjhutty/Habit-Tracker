@@ -9,7 +9,7 @@ import 'package:habit_tracker/controller/cloud/cloud_constants.dart';
 import 'package:habit_tracker/controller/local/db_constants.dart';
 import 'package:habit_tracker/model/habit_model.dart';
 
-class DbController extends GetxController {
+class DbController extends ChangeNotifier {
   List<HabitModel> habitList = <HabitModel>[];
   Map<DateTime, int> heatMapDataset = {};
   final firestore =
@@ -18,7 +18,7 @@ class DbController extends GetxController {
 
   void changeTheme(Color themeColor) {
     box.put(BoxConstants.appThemeColorValue, themeColor.value);
-    update();
+    notifyListeners();
   }
 
   ///Save all the local saved values to Cloud Firestore.
@@ -33,7 +33,7 @@ class DbController extends GetxController {
     Get.rawSnackbar(message: 'All data is synced to cloud');
   }
 
-  ///Update List on Changes to Databse
+  ///notifyListeners List on Changes to Databse
   void saveUpdatedList() async {
     _user != null
         ? await firestore.doc(CloudConstants.docName + _user.uid).set(toMap(
@@ -44,7 +44,7 @@ class DbController extends GetxController {
                 DbController.habbitListKey(DateTime.now()),
             habitList);
 
-    update();
+    notifyListeners();
   }
 
   ///Return a Map to store values to firestore
@@ -83,10 +83,10 @@ class DbController extends GetxController {
             BoxConstants.habitListKeyText + habbitListKey(DateTime.now()),
             habitList);
     print('habit added ${_user?.uid ?? ''}');
-    update();
+    notifyListeners();
   }
 
-  ///Update existing Habit in Database.
+  ///notifyListeners existing Habit in Database.
   updateHabit(
       {required int index,
       required String title,
@@ -107,9 +107,9 @@ class DbController extends GetxController {
             .doc(CloudConstants.docName + _user.uid)
             .set(toMap(listDayKey, habitListToMap(habitList)))
         : await box.put(listDayKey, habitList);
-    print('habit updated');
+    print('habit notifyListenersd');
 
-    update();
+    notifyListeners();
   }
 
   ///Returns a DateTime picker Widget.
@@ -151,7 +151,7 @@ class DbController extends GetxController {
     double totalTime = habitList[index].totalHabbitTime!;
 
     habitList[index].running = !habitList[index].running!;
-    // update();  //show a bug(timer goes forward and back to previous)
+    // notifyListeners();  //show a bug(timer goes forward and back to previous)
     if (habitList[index].running!) {
       habitList[index].elapsedTime =
           habitList[index].elapsedTime! + habitList[index].initialHabbitTime!;
@@ -171,7 +171,7 @@ class DbController extends GetxController {
                       onPressed: () {
                         habitList[index].initialHabbitTime = 0;
                         habitList[index].elapsedTime = 0;
-                        update();
+                        notifyListeners();
 
                         navigator!.pop();
                       },
@@ -201,7 +201,7 @@ class DbController extends GetxController {
                   BoxConstants.habitListKeyText + habbitListKey(DateTime.now()),
                   habitList);
           timer.cancel();
-          update();
+          notifyListeners();
         } else if (habitList[index].initialHabbitTime! +
                     habitList[index].elapsedTime! >=
                 totalTime ||
@@ -215,7 +215,7 @@ class DbController extends GetxController {
 
           percentCompleted();
           loadHeatMap();
-          update();
+          notifyListeners();
           _user != null
               ? await firestore.doc(CloudConstants.docName + _user.uid).set(
                   toMap(
@@ -225,7 +225,7 @@ class DbController extends GetxController {
               : await box.put(
                   BoxConstants.habitListKeyText + habbitListKey(DateTime.now()),
                   habitList);
-          print('list updated');
+          print('list notifyListenersd');
           timer.cancel();
           Get.rawSnackbar(message: 'Habbit completed');
         } else {
@@ -233,7 +233,7 @@ class DbController extends GetxController {
 
           habitList[index].initialHabbitTime =
               ((time2.difference(time).inSeconds) / 60).toDouble();
-          update();
+          notifyListeners();
           // print(
           //     'total time ${habitList[index].title}: ${habitList[index].initialHabbitTime.toStringAsFixed(2)}');
         }
