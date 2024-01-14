@@ -1,7 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:get/get.dart';
 import 'package:provider/provider.dart';
 import '../../controller/local/db_constants.dart';
 import '../../controller/db_controller.dart';
@@ -146,44 +145,46 @@ class _AddHabitState extends State<AddHabit> {
                         padding: const EdgeInsets.only(top: 24),
                         child: Row(children: [
                           Expanded(
-                            child: ElevatedButton(
-                                onPressed: () {
-                                  if (formkey.currentState!.validate()) {
-                                    widget.data == null || widget.index == null
-                                        ? context.read<DbController>().newHabit(
-                                            title: nameController.text,
-                                            totalTime:
-                                                timedb.timeOfDayToDouble(time!),
-                                            isStart: isStarted)
-                                        : context
-                                            .read<DbController>()
-                                            .updateHabit(
-                                                index: widget.index!,
-                                                title: nameController.text,
-                                                elapsedTime:
-                                                    widget.data!.elapsedTime!,
-                                                initilTime: widget
-                                                    .data!.initialHabbitTime!,
-                                                totalTime: time != null
-                                                    ? timedb.timeOfDayToDouble(
-                                                        time!)
-                                                    : widget
-                                                        .data!.totalHabbitTime!,
-                                                listDayKey: BoxConstants
-                                                        .habitListKeyText +
-                                                    DbController.habbitListKey(
-                                                        DateTime.now()),
-                                                isStart: isStarted);
-                                    Navigator.pop(context);
-                                  }
-                                },
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: scheme.primary,
-                                  foregroundColor: scheme.onPrimary,
-                                  padding:
-                                      const EdgeInsets.symmetric(vertical: 20),
-                                ),
-                                child: const Text('Save')),
+                            child: Consumer<DbController>(
+                                builder: (context, db, child) {
+                              return ElevatedButton(
+                                  onPressed: () {
+                                    if (formkey.currentState!.validate()) {
+                                      widget.data == null ||
+                                              widget.index == null
+                                          ? db.newHabit(
+                                              title: nameController.text,
+                                              totalTime: timedb
+                                                  .timeOfDayToDouble(time!),
+                                              isStart: isStarted)
+                                          : db.updateHabit(
+                                              index: widget.index!,
+                                              title: nameController.text,
+                                              elapsedTime:
+                                                  widget.data!.elapsedTime!,
+                                              initilTime: widget
+                                                  .data!.initialHabbitTime!,
+                                              totalTime: time != null
+                                                  ? timedb
+                                                      .timeOfDayToDouble(time!)
+                                                  : widget
+                                                      .data!.totalHabbitTime!,
+                                              listDayKey: BoxConstants
+                                                      .habitListKeyText +
+                                                  DbController.habbitListKey(
+                                                      DateTime.now()),
+                                              isStart: isStarted);
+                                      Navigator.pop(context);
+                                    }
+                                  },
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: scheme.primary,
+                                    foregroundColor: scheme.onPrimary,
+                                    padding: const EdgeInsets.symmetric(
+                                        vertical: 20),
+                                  ),
+                                  child: const Text('Save'));
+                            }),
                           ),
                         ]),
                       )

@@ -5,6 +5,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:habit_tracker/assets/asset_widgets.dart';
 import 'package:habit_tracker/controller/cloud/cloud_constants.dart';
 import 'package:habit_tracker/controller/local/db_constants.dart';
 import 'package:habit_tracker/model/habit_model.dart';
@@ -15,30 +16,62 @@ class DbController extends ChangeNotifier {
   final firestore =
       FirebaseFirestore.instance.collection(CloudConstants.collections);
   final User? _user = FirebaseAuth.instance.currentUser;
+  MyWidgets myWidgets = MyWidgets();
 
+  ///Get the list saved in user's database
+  ///only to be used when logging in, not to invoke when app starts or builds
+  ///for a seamless experience
+  getFirestoreList() async {
+    try {
+      var snapshot =
+          await firestore.doc(CloudConstants.docName + _user!.uid).get();
+      List dataMap = snapshot.get(CloudConstants.habitListKeyText +
+          DbController.habbitListKey(DateTime.now()));
+
+      List<Map<String, dynamic>> habitListMap =
+          dataMap.cast<Map<String, dynamic>>();
+
+      for (Map<String, dynamic> element in habitListMap) {
+        habitList.add(HabitModel.fromMap(element));
+        notifyListeners();
+      }
+      print('list loaded from cloud');
+    } catch (e) {
+      print('Unexpected error occured: $e');
+    }
+  }
+
+  ///Saves the provided theme color in local storage
+  ///and also notifies all listners.
   void changeTheme(Color themeColor) {
     box.put(BoxConstants.appThemeColorValue, themeColor.value);
     notifyListeners();
   }
 
   ///Save all the local saved values to Cloud Firestore.
-  void syncToCloud() async {
-    Get.rawSnackbar(message: 'This may take sometime...');
+  void syncToCloud(BuildContext context) async {
+    myWidgets.mySnackbar('This may take sometime...');
 
-    for (int index = 0; index < box.length; index++) {
-      await firestore
-          .doc(CloudConstants.docName + _user!.uid)
-          .set({'${box.keyAt(index)}': box.getAt(index)});
+    if (box.isNotEmpty) {
+      for (int index = 0; index < box.length; index++) {
+        await firestore.doc(CloudConstants.docName + _user!.uid).set(
+            {'${box.keyAt(index)}': box.getAt(index)}, SetOptions(merge: true));
+      }
+      myWidgets.mySnackbar('All data is synced to cloud');
+    } else {
+      myWidgets.mySnackbar('No entries found in local storage');
     }
-    Get.rawSnackbar(message: 'All data is synced to cloud');
   }
 
-  ///notifyListeners List on Changes to Databse
+  ///update List on Changes to Databse
+  ///not to call when updating list items, only call when secondary function is perform like deleting a habit. So that it can save changes to db.
   void saveUpdatedList() async {
     _user != null
-        ? await firestore.doc(CloudConstants.docName + _user.uid).set(toMap(
-            CloudConstants.habitListKeyText + habbitListKey(DateTime.now()),
-            habitListToMap(habitList)))
+        ? await firestore.doc(CloudConstants.docName + _user.uid).set(
+            toMap(
+                CloudConstants.habitListKeyText + habbitListKey(DateTime.now()),
+                habitListToMap(habitList)),
+            SetOptions(merge: true))
         : await box.put(
             BoxConstants.habitListKeyText +
                 DbController.habbitListKey(DateTime.now()),
@@ -76,17 +109,19 @@ class DbController extends ChangeNotifier {
         running: isStart,
         completed: false));
     _user != null
-        ? await firestore.doc(CloudConstants.docName + _user.uid).set(toMap(
-            CloudConstants.habitListKeyText + habbitListKey(DateTime.now()),
-            habitListToMap(habitList)))
+        ? await firestore.doc(CloudConstants.docName + _user.uid).set(
+            toMap(
+                CloudConstants.habitListKeyText + habbitListKey(DateTime.now()),
+                habitListToMap(habitList)),
+            SetOptions(merge: true))
         : await box.put(
             BoxConstants.habitListKeyText + habbitListKey(DateTime.now()),
             habitList);
-    print('habit added ${_user?.uid ?? ''}');
+    print('habit added ${_user?.uid ?? 'to box'}');
     notifyListeners();
   }
 
-  ///notifyListeners existing Habit in Database.
+  ///Update existing Habit in Database.
   updateHabit(
       {required int index,
       required String title,
@@ -103,11 +138,11 @@ class DbController extends ChangeNotifier {
         running: isStart,
         completed: initilTime == totalTime ? true : false);
     _user != null
-        ? await firestore
-            .doc(CloudConstants.docName + _user.uid)
-            .set(toMap(listDayKey, habitListToMap(habitList)))
+        ? await firestore.doc(CloudConstants.docName + _user.uid).set(
+            toMap(listDayKey, habitListToMap(habitList)),
+            SetOptions(merge: true))
         : await box.put(listDayKey, habitList);
-    print('habit notifyListenersd');
+    print('habit updated');
 
     notifyListeners();
   }
@@ -126,7 +161,8 @@ class DbController extends ChangeNotifier {
     return time;
   }
 
-  ///Return a String value for storing in database from Datetime object.
+  ///Converts Datetime object to a String of Integers containing date, eg :20240101.
+  ///helps in storing to db
   static String habbitListKey(DateTime date) {
     String year = date.year.toString();
     String month =
@@ -137,7 +173,8 @@ class DbController extends ChangeNotifier {
     return year + month + day;
   }
 
-  ///Converts DateTime object from String value containing date.
+  ///Converts String of Integers to a Datetime object.
+  ///helps in getting date from db
   static habbitListKeytoDateTime(String date) {
     int year = int.parse(date.substring(0, 4));
     int month = int.parse(date.substring(4, 6));
@@ -147,7 +184,7 @@ class DbController extends ChangeNotifier {
   }
 
   ///Action to perform on Habit play/pause button tap
-  habitOnTap({required int index}) async {
+  habitOnTap({required BuildContext context, required int index}) async {
     double totalTime = habitList[index].totalHabbitTime!;
 
     habitList[index].running = !habitList[index].running!;
@@ -161,7 +198,7 @@ class DbController extends ChangeNotifier {
         totalTime) {
       habitList[index].running = false;
       showDialog(
-          context: navigator!.context,
+          context: context,
           builder: (context) => AlertDialog(
                 title: const Text('Reset Habit'),
                 content: const Text(
@@ -173,12 +210,12 @@ class DbController extends ChangeNotifier {
                         habitList[index].elapsedTime = 0;
                         notifyListeners();
 
-                        navigator!.pop();
+                        Navigator.pop(context);
                       },
                       child: const Text('Yes')),
                   TextButton(
                       onPressed: () {
-                        navigator!.pop();
+                        Navigator.pop(context);
                       },
                       child: const Text('No'))
                 ],
@@ -196,7 +233,8 @@ class DbController extends ChangeNotifier {
                   toMap(
                       CloudConstants.habitListKeyText +
                           habbitListKey(DateTime.now()),
-                      habitListToMap(habitList)))
+                      habitListToMap(habitList)),
+                  SetOptions(merge: true))
               : await box.put(
                   BoxConstants.habitListKeyText + habbitListKey(DateTime.now()),
                   habitList);
@@ -214,20 +252,21 @@ class DbController extends ChangeNotifier {
           notifyHabit();
 
           percentCompleted();
-          loadHeatMap();
+          await loadHeatMap();
           notifyListeners();
           _user != null
               ? await firestore.doc(CloudConstants.docName + _user.uid).set(
                   toMap(
                       CloudConstants.habitListKeyText +
                           habbitListKey(DateTime.now()),
-                      habitListToMap(habitList)))
+                      habitListToMap(habitList)),
+                  SetOptions(merge: true))
               : await box.put(
                   BoxConstants.habitListKeyText + habbitListKey(DateTime.now()),
                   habitList);
-          print('list notifyListenersd');
+          print('list updated');
           timer.cancel();
-          Get.rawSnackbar(message: 'Habbit completed');
+          myWidgets.mySnackbar('Habbit completed');
         } else {
           var time2 = DateTime.now();
 
@@ -262,9 +301,11 @@ class DbController extends ChangeNotifier {
     double percentSummary =
         habitList.isNotEmpty ? completed / habitList.length : 0.0;
     _user != null
-        ? await firestore.doc(CloudConstants.docName + _user.uid).set(toMap(
-            CloudConstants.habitSummaryText + habbitListKey(DateTime.now()),
-            percentSummary))
+        ? await firestore.doc(CloudConstants.docName + _user.uid).set(
+            toMap(
+                CloudConstants.habitSummaryText + habbitListKey(DateTime.now()),
+                percentSummary),
+            SetOptions(merge: true))
         : await box.put(
             BoxConstants.habitSummaryText + habbitListKey(DateTime.now()),
             percentSummary);
@@ -272,7 +313,7 @@ class DbController extends ChangeNotifier {
   }
 
   ///Heatmap enteries for graph
-  void loadHeatMap() async {
+  loadHeatMap() async {
     DateTime date = habbitListKeytoDateTime(box.get(BoxConstants.startDateKey));
 
     int dayInBW = DateTime.now().difference(date).inDays;

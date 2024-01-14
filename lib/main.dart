@@ -2,6 +2,7 @@ import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:provider/provider.dart';
 import 'assets/asset_widgets.dart';
@@ -52,6 +53,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     Color color = Color(box.get(BoxConstants.appThemeColorValue) ??
         const Color(0xFFFB5B76).value);
+
     return MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (context) => ProfileController()),
@@ -100,6 +102,7 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
   late TabController _tabController;
   User? user = FirebaseAuth.instance.currentUser;
+  FirebaseFirestore firestore = FirebaseFirestore.instance;
 
   final List<Tab> _tabs = [
     const Tab(text: 'Home'),
@@ -109,61 +112,38 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
   @override
   void initState() {
     _tabController = TabController(length: _tabs.length, vsync: this);
-    if (box.get(BoxConstants.startDateKey) == null) {
-      box.put(BoxConstants.startDateKey,
-          DbController.habbitListKey(DateTime.now()));
-    }
-    user != null ? _getCloudList() : _getList();
+    _appInitialDate();
+    _requestNotiPermission();
 
+    super.initState();
+  }
+
+  _requestNotiPermission() {
     AwesomeNotifications().isNotificationAllowed().then((value) {
       if (!value) {
         // Checking if notifications are allowed
         AwesomeNotifications().requestPermissionToSendNotifications();
       }
     });
-    super.initState();
   }
 
-  _getList() async {
-    try {
-      List list = await box.get(BoxConstants.habitListKeyText +
-              DbController.habbitListKey(DateTime.now())) ??
-          <HabitModel>[];
-
-      List localList = list.map((e) => e as HabitModel).toList();
-      setState(() {
-        context.read<DbController>().habitList = localList.cast<HabitModel>();
-      });
-    } catch (e) {
-      print('Unexpected error occured: $e');
-    }
-  }
-
-  _getCloudList() async {
-    FirebaseFirestore firestore = FirebaseFirestore.instance;
-    try {
-      var snapshot = await firestore
+  _appInitialDate() async {
+    if (user != null) {
+      var doc = firestore
           .collection(CloudConstants.collections)
-          .doc(CloudConstants.docName + user!.uid)
-          .get();
-      List dataMap = snapshot.get(CloudConstants.habitListKeyText +
-          DbController.habbitListKey(DateTime.now()));
-
-      List<Map<String, dynamic>> habitListMap =
-          dataMap.cast<Map<String, dynamic>>();
-
-      for (var element in habitListMap) {
-        setState(() {
-          context
-              .read<DbController>()
-              .habitList
-              .add(HabitModel.fromMap(element));
-        });
+          .doc(CloudConstants.docName + user!.uid);
+      var snapshot = await doc.get();
+      if (snapshot.get(CloudConstants.startDateKey) == null) {
+        doc.set(
+            DbController().toMap(CloudConstants.startDateKey,
+                DbController.habbitListKey(DateTime.now())),
+            SetOptions(merge: true));
       }
-      Future.delayed(const Duration(milliseconds: 1))
-          .then((value) => setState(() {}));
-    } catch (e) {
-      print('Unexpected error occured: $e');
+    } else {
+      if (box.get(BoxConstants.startDateKey) == null) {
+        box.put(BoxConstants.startDateKey,
+            DbController.habbitListKey(DateTime.now()));
+      }
     }
   }
 
@@ -196,7 +176,7 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
         foregroundColor: scheme.onPrimary,
         elevation: 4,
         shape: const CircleBorder(),
-        onPressed: () => Get.toNamed('/add-habit'),
+        onPressed: () => Navigator.pushNamed(context, '/add-habit'),
         tooltip: 'Create a Habbit',
         child: const Icon(Icons.add_task_rounded),
       ),

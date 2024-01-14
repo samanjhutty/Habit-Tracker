@@ -1,8 +1,11 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 import 'package:percent_indicator/percent_indicator.dart';
 import 'package:provider/provider.dart';
+import '../../controller/cloud/cloud_constants.dart';
 import '../../controller/db_controller.dart';
+import '../../controller/local/db_constants.dart';
 import '../../controller/time_controller.dart';
 import '../../model/habit_model.dart';
 import '../pages/add_habit.dart';
@@ -15,6 +18,59 @@ class HabitTile extends StatefulWidget {
 }
 
 class _HabitTileState extends State<HabitTile> {
+  User? user = FirebaseAuth.instance.currentUser;
+
+  @override
+  void initState() {
+    user != null ? _getCloudList() : _getList();
+    super.initState();
+  }
+
+  _getList() async {
+    DbController db = context.read<DbController>();
+
+    try {
+      List list = await box.get(BoxConstants.habitListKeyText +
+              DbController.habbitListKey(DateTime.now())) ??
+          <HabitModel>[];
+
+      List localList = list.map((e) => e as HabitModel).toList();
+      setState(() {
+        db.habitList = localList.cast<HabitModel>();
+      });
+      print('list loaded from box');
+    } catch (e) {
+      print('Unexpected error occured: $e');
+    }
+  }
+
+  _getCloudList() async {
+    FirebaseFirestore firestore = FirebaseFirestore.instance;
+    DbController db = context.read<DbController>();
+    try {
+      var snapshot = await firestore
+          .collection(CloudConstants.collections)
+          .doc(CloudConstants.docName + user!.uid)
+          .get();
+
+      List dataMap = snapshot.get(CloudConstants.habitListKeyText +
+              DbController.habbitListKey(DateTime.now())) ??
+          [];
+
+      List<Map<String, dynamic>> habitListMap =
+          dataMap.cast<Map<String, dynamic>>();
+
+      for (Map<String, dynamic> element in habitListMap) {
+        setState(() {
+          db.habitList.add(HabitModel.fromMap(element));
+        });
+      }
+      print('list loaded from cloud');
+    } catch (e) {
+      print('Unexpected error occured: $e');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     ColorScheme scheme = Theme.of(context).colorScheme;
@@ -59,15 +115,12 @@ class _HabitTileState extends State<HabitTile> {
                             (list.initialHabbitTime! + list.elapsedTime!);
 
                         String remainingInitialTime = initialTime > 60
-                            ? '${TimeController().formatedTime((initialTime / 60).floor(), (initialTime - 60).ceil())} hrs'
+                            ? '${TimeController().formatedTime((initialTime / 60).floor(), (((list.totalHabbitTime! / 60) - (list.totalHabbitTime! / 60).floor()) * 60).toInt())} hrs'
                             : '${initialTime.ceil()} min';
 
                         String totalTime = list.totalHabbitTime! > 60
-                            ? '${TimeController().formatedTime((list.totalHabbitTime! / 60).floor(), (list.totalHabbitTime! - 60).ceil())} hrs'
+                            ? '${TimeController().formatedTime((list.totalHabbitTime! / 60).floor(), (((list.totalHabbitTime! / 60) - (list.totalHabbitTime! / 60).floor()) * 60).toInt())} hrs'
                             : '${list.totalHabbitTime!.ceil()} min';
-
-                        db.percentCompleted();
-                        db.loadHeatMap();
 
                         return Padding(
                             padding: const EdgeInsets.symmetric(horizontal: 10),
@@ -81,7 +134,8 @@ class _HabitTileState extends State<HabitTile> {
                                       list.running == true ? 'Pause' : 'Play',
                                   child: InkWell(
                                     customBorder: const CircleBorder(),
-                                    onTap: () => db.habitOnTap(index: index),
+                                    onTap: () => db.habitOnTap(
+                                        context: context, index: index),
                                     child: Stack(
                                       fit: StackFit.passthrough,
                                       alignment: Alignment.center,
@@ -116,8 +170,11 @@ class _HabitTileState extends State<HabitTile> {
                                   child: const Icon(Icons.settings),
                                   itemBuilder: (context) => [
                                     PopupMenuItem(
-                                        onTap: () => Get.to(() =>
-                                            AddHabit(data: list, index: index)),
+                                        onTap: () => Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                                builder: (context) => AddHabit(
+                                                    data: list, index: index))),
                                         child: const Row(
                                           children: [
                                             Icon(Icons.edit),
@@ -144,7 +201,8 @@ class _HabitTileState extends State<HabitTile> {
                                                                 .symmetric(
                                                                 horizontal: 16),
                                                         onPressed: () =>
-                                                            navigator!.pop(),
+                                                            Navigator.pop(
+                                                                context),
                                                         icon: Text(
                                                           'Cancel',
                                                           style: TextStyle(
@@ -164,7 +222,7 @@ class _HabitTileState extends State<HabitTile> {
                                                               .removeAt(index);
                                                         });
                                                         db.saveUpdatedList();
-                                                        navigator!.pop();
+                                                        Navigator.pop(context);
                                                       },
                                                       icon:
                                                           const Text('Delete'),

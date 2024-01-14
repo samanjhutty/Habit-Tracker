@@ -1,11 +1,10 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 import 'package:habit_tracker/controller/cloud/auth/profile_controller.dart';
 import 'package:habit_tracker/controller/cloud/auth/signin_controller.dart';
 import 'package:habit_tracker/controller/cloud/auth/signup_controller.dart';
 import 'package:habit_tracker/controller/db_controller.dart';
+import 'package:habit_tracker/view/widgets/theme_sheet.dart';
 import 'package:provider/provider.dart';
 
 class UserProfile extends StatefulWidget {
@@ -15,11 +14,8 @@ class UserProfile extends StatefulWidget {
   State<UserProfile> createState() => _UserProfileState();
 }
 
-class _UserProfileState extends State<UserProfile>
-    with TickerProviderStateMixin {
+class _UserProfileState extends State<UserProfile> {
   FirebaseAuth auth = FirebaseAuth.instance;
-  FirebaseFirestore firestore = FirebaseFirestore.instance;
-  Color appThemeColor = const Color(0xFFFB5B76);
 
   @override
   Widget build(BuildContext context) {
@@ -68,8 +64,8 @@ class _UserProfileState extends State<UserProfile>
                                               backgroundColor: scheme.primary,
                                               foregroundColor:
                                                   scheme.onPrimary),
-                                          onPressed: () =>
-                                              Get.toNamed('/signin'),
+                                          onPressed: () => Navigator.pushNamed(
+                                              context, '/signin'),
                                           icon: const Icon(Icons.login),
                                           label:
                                               const Text('Sign In to continue'))
@@ -95,6 +91,10 @@ class _UserProfileState extends State<UserProfile>
                                 ),
                                 ListTile(
                                   trailing: CircleAvatar(
+                                    onBackgroundImageError:
+                                        (exception, stackTrace) {
+                                      print('Image error $exception');
+                                    },
                                     backgroundImage: NetworkImage(
                                         auth.currentUser!.photoURL!),
                                   ),
@@ -119,8 +119,8 @@ class _UserProfileState extends State<UserProfile>
                                             shape: RoundedRectangleBorder(
                                                 borderRadius:
                                                     BorderRadius.circular(8))),
-                                        onPressed: () =>
-                                            Get.toNamed('/profile'),
+                                        onPressed: () => Navigator.pushNamed(
+                                            context, '/profile'),
                                         label: const Text('Edit'),
                                         icon: const Icon(Icons.edit),
                                       ),
@@ -136,164 +136,8 @@ class _UserProfileState extends State<UserProfile>
                                                     BorderRadius.circular(8))),
                                         onPressed: () => showModalBottomSheet(
                                             context: context,
-                                            builder: (context) {
-                                              return BottomSheet(
-                                                animationController: BottomSheet
-                                                    .createAnimationController(
-                                                        this),
-                                                showDragHandle: true,
-                                                onClosing: () {},
-                                                builder: (context) => Column(
-                                                  mainAxisSize:
-                                                      MainAxisSize.min,
-                                                  children: [
-                                                    RadioListTile(
-                                                      value: const Color(
-                                                          0xFFFB5B76),
-                                                      groupValue: appThemeColor,
-                                                      onChanged: (value) {
-                                                        setState(() {
-                                                          appThemeColor =
-                                                              value!;
-                                                        });
-                                                      },
-                                                      title: Row(
-                                                        mainAxisAlignment:
-                                                            MainAxisAlignment
-                                                                .spaceBetween,
-                                                        children: [
-                                                          const Text('Default'),
-                                                          Container(
-                                                            decoration: BoxDecoration(
-                                                                color: scheme
-                                                                    .secondary,
-                                                                shape: BoxShape
-                                                                    .circle),
-                                                            padding:
-                                                                const EdgeInsets
-                                                                    .all(4),
-                                                            child:
-                                                                const CircleAvatar(
-                                                              radius: 16,
-                                                              backgroundColor:
-                                                                  Color(
-                                                                      0xFFFB5B76),
-                                                            ),
-                                                          )
-                                                        ],
-                                                      ),
-                                                    ),
-                                                    RadioListTile(
-                                                      value: Colors
-                                                          .lightGreenAccent,
-                                                      groupValue: appThemeColor,
-                                                      onChanged: (value) {
-                                                        setState(() {
-                                                          appThemeColor =
-                                                              value!;
-                                                        });
-                                                      },
-                                                      title: Row(
-                                                        mainAxisAlignment:
-                                                            MainAxisAlignment
-                                                                .spaceBetween,
-                                                        children: [
-                                                          const Text(
-                                                              'Light Green'),
-                                                          Container(
-                                                            decoration: BoxDecoration(
-                                                                color: scheme
-                                                                    .secondary,
-                                                                shape: BoxShape
-                                                                    .circle),
-                                                            padding:
-                                                                const EdgeInsets
-                                                                    .all(4),
-                                                            child:
-                                                                const CircleAvatar(
-                                                              radius: 16,
-                                                              backgroundColor:
-                                                                  Colors
-                                                                      .lightGreenAccent,
-                                                            ),
-                                                          )
-                                                        ],
-                                                      ),
-                                                    ),
-                                                    RadioListTile(
-                                                      value: Colors
-                                                          .lightBlueAccent,
-                                                      groupValue: appThemeColor,
-                                                      onChanged: (value) {
-                                                        setState(() {
-                                                          appThemeColor =
-                                                              value!;
-                                                        });
-                                                      },
-                                                      title: Row(
-                                                        mainAxisAlignment:
-                                                            MainAxisAlignment
-                                                                .spaceBetween,
-                                                        children: [
-                                                          const Text(
-                                                              'Light Blue'),
-                                                          Container(
-                                                            decoration: BoxDecoration(
-                                                                color: scheme
-                                                                    .secondary,
-                                                                shape: BoxShape
-                                                                    .circle),
-                                                            padding:
-                                                                const EdgeInsets
-                                                                    .all(4),
-                                                            child:
-                                                                const CircleAvatar(
-                                                              radius: 16,
-                                                              backgroundColor:
-                                                                  Colors
-                                                                      .lightBlueAccent,
-                                                            ),
-                                                          )
-                                                        ],
-                                                      ),
-                                                    ),
-                                                    Padding(
-                                                      padding:
-                                                          const EdgeInsets.all(
-                                                              8),
-                                                      child: Row(
-                                                        mainAxisAlignment:
-                                                            MainAxisAlignment
-                                                                .end,
-                                                        children: [
-                                                          ElevatedButton.icon(
-                                                              style: ElevatedButton.styleFrom(
-                                                                  backgroundColor:
-                                                                      scheme
-                                                                          .primary,
-                                                                  foregroundColor:
-                                                                      scheme
-                                                                          .onPrimary),
-                                                              onPressed: () {
-                                                                navigator!
-                                                                    .pop();
-                                                                context
-                                                                    .read<
-                                                                        DbController>()
-                                                                    .changeTheme(
-                                                                        appThemeColor);
-                                                              },
-                                                              label: const Text(
-                                                                  'Save'),
-                                                              icon: const Icon(
-                                                                  Icons.check))
-                                                        ],
-                                                      ),
-                                                    )
-                                                  ],
-                                                ),
-                                              );
-                                            }),
+                                            builder: (_) =>
+                                                const MyBottomSheet()),
                                         label: const Text('Theme'),
                                         icon: const Icon(Icons.color_lens),
                                       ),
@@ -307,7 +151,9 @@ class _UserProfileState extends State<UserProfile>
                                             shape: RoundedRectangleBorder(
                                                 borderRadius:
                                                     BorderRadius.circular(8))),
-                                        onPressed: () => db.syncToCloud(),
+                                        onPressed: () => context
+                                            .watch<DbController>()
+                                            .syncToCloud(context),
                                         label: const Text('Sync'),
                                         icon: const Icon(Icons.sync),
                                       ),
@@ -340,12 +186,12 @@ class _UserProfileState extends State<UserProfile>
                                           actions: [
                                             TextButton(
                                                 onPressed: () =>
-                                                    navigator!.pop(),
+                                                    Navigator.pop(context),
                                                 child: const Text('Cancel')),
                                             TextButton(
                                                 onPressed: () {
                                                   signin.logout();
-                                                  navigator!.pop();
+                                                  Navigator.pop(context);
                                                 },
                                                 child: const Text('Logout'))
                                           ],

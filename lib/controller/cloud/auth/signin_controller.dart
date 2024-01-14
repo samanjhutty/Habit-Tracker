@@ -3,10 +3,14 @@ import 'package:firebase_storage/firebase_storage.dart' as storage;
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:habit_tracker/assets/asset_widgets.dart';
+import 'package:habit_tracker/controller/db_controller.dart';
 
 class SignInAuth with ChangeNotifier {
   final FirebaseAuth auth = FirebaseAuth.instance;
   String verifyID = '';
+  MyWidgets widgets = MyWidgets();
+  DbController db = DbController();
 
   TextEditingController emailAddress = TextEditingController();
   TextEditingController password = TextEditingController();
@@ -14,6 +18,8 @@ class SignInAuth with ChangeNotifier {
   Future<void> emailLogin() async =>
       await _signInWithEmail(emailAddress.text.trim(), password.text.trim())
           .whenComplete(() {
+        db.getFirestoreList();
+
         emailAddress.clear();
         password.clear();
       });
@@ -21,31 +27,29 @@ class SignInAuth with ChangeNotifier {
   Future<void> logout() async {
     await auth.signOut();
     notifyListeners();
-    Get.rawSnackbar(message: 'Logged out Sucessfully');
+    widgets.mySnackbar('Logged out Sucessfully');
   }
 
   Future<void> deleteUser() async {
     await auth.currentUser!.delete();
     notifyListeners();
-    Get.rawSnackbar(message: 'Account deleted Sucessfully');
+    widgets.mySnackbar('Account deleted Sucessfully');
   }
-
-  void refresh() => notifyListeners();
 
   Future<void> _signInWithEmail(String email, String password) async {
     try {
       await auth.signInWithEmailAndPassword(email: email, password: password);
 
-      Get.rawSnackbar(message: 'Logged in Sucessfully');
+      widgets.mySnackbar('Logged in Sucessfully');
       notifyListeners();
       Get.until(ModalRoute.withName('/'));
     } on FirebaseAuthException catch (e) {
       if (e.code == 'user-not-found') {
-        Get.rawSnackbar(message: 'No user found for that email.');
+        widgets.mySnackbar('No user found for that email.');
       } else if (e.code == 'invalid-email') {
-        Get.rawSnackbar(message: 'Wrong email provided for that user.');
+        widgets.mySnackbar('Wrong email provided for that user.');
       } else if (e.code == 'wrong-password') {
-        Get.rawSnackbar(message: 'Wrong password provided for that user.');
+        widgets.mySnackbar('Wrong password provided for that user.');
       }
     } catch (e) {
       debugPrint(e.toString());
@@ -66,10 +70,11 @@ class SignInAuth with ChangeNotifier {
       await auth.signInWithCredential(credential);
       notifyListeners();
       Get.until(ModalRoute.withName('/'));
-      Get.rawSnackbar(message: 'Logged in via Google');
+      db.getFirestoreList();
+      widgets.mySnackbar('Logged in via Google');
     } on FirebaseAuthException {
       Get.until(ModalRoute.withName('/'));
-      Get.rawSnackbar(message: 'Something went Wrong, try again!');
+      widgets.mySnackbar('Something went Wrong, try again!');
     }
   }
 
@@ -79,15 +84,14 @@ class SignInAuth with ChangeNotifier {
         verificationCompleted: (PhoneAuthCredential authCredential) {},
         verificationFailed: (FirebaseAuthException e) {
           if (e.code == 'too-many-requests') {
-            Get.rawSnackbar(message: 'Too many requests, try after sometime');
+            widgets.mySnackbar('Too many requests, try after sometime');
           }
         },
         codeSent: (String verificationID, int? resendCode) {
           Get.toNamed('/reauth');
           verifyID = verificationID;
-          Get.rawSnackbar(
-              message:
-                  'OTP has been sent to your mobile number ${auth.currentUser!.phoneNumber}');
+          widgets.mySnackbar(
+              'OTP has been sent to your mobile number ${auth.currentUser!.phoneNumber}');
         },
         codeAutoRetrievalTimeout: (String verificationId) {});
   }
@@ -124,7 +128,7 @@ class SignInAuth with ChangeNotifier {
             await auth.currentUser!.reauthenticateWithCredential(credential);
           } on FirebaseAuthException catch (e) {
             if (e.code == 'wrong-password') {
-              Get.rawSnackbar(message: 'Wrong password entered, try again');
+              widgets.mySnackbar('Wrong password entered, try again');
             }
           }
           break;
@@ -135,14 +139,14 @@ class SignInAuth with ChangeNotifier {
             await auth.signInWithCredential(authCredential);
           } on FirebaseAuthException catch (e) {
             if (e.code == 'invalid-verification-code') {
-              Get.rawSnackbar(message: 'Invalid code');
+              widgets.mySnackbar('Invalid code');
             } else if (e.code == 'too-many-requests') {
-              Get.rawSnackbar(message: 'Too many requests, try after sometime');
+              widgets.mySnackbar('Too many requests, try after sometime');
             }
           }
           break;
         default:
-          Get.rawSnackbar(message: 'Provider is Unknown');
+          widgets.mySnackbar('Provider is Unknown');
       }
       storage.Reference refRoot = fbStorage.ref().child('USER-profileImage');
       storage.Reference ref =
@@ -153,13 +157,13 @@ class SignInAuth with ChangeNotifier {
       notifyListeners();
     } on FirebaseAuthException catch (e) {
       if (e.code == 'invalid-verification-code') {
-        Get.rawSnackbar(message: 'Invalid code, try again');
+        widgets.mySnackbar('Invalid code, try again');
       } else if (e.code == 'wrong-password') {
-        Get.rawSnackbar(message: 'Wrong Password, try again');
+        widgets.mySnackbar('Wrong Password, try again');
       } else if (e.code == 'invalid-credential') {
-        Get.rawSnackbar(message: 'Wrong Credentials, try again');
+        widgets.mySnackbar('Wrong Credentials, try again');
       } else if (e.code == 'too-many-requests') {
-        Get.rawSnackbar(message: 'Too many requests, try after sometime');
+        widgets.mySnackbar('Too many requests, try after sometime');
       }
     }
     Get.until(ModalRoute.withName('/'));

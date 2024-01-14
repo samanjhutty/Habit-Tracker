@@ -1,11 +1,15 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:habit_tracker/assets/asset_widgets.dart';
+import 'package:habit_tracker/controller/db_controller.dart';
 import 'profile_controller.dart';
 
 class SignUpAuth extends ChangeNotifier {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final ProfileController profile = ProfileController();
+  MyWidgets widgets = MyWidgets();
+  DbController db = DbController();
 
   TextEditingController phone = TextEditingController();
   TextEditingController username = TextEditingController();
@@ -22,8 +26,9 @@ class SignUpAuth extends ChangeNotifier {
     await _signUpWithEmail(emailAddress.text.trim(), password.text.trim(),
         confirmPassword.text.trim());
     await profile.updateProfile();
+    db.getFirestoreList();
     notifyListeners();
-    Get.rawSnackbar(message: 'Account created sucessfully');
+    widgets.mySnackbar('Account created sucessfully');
     Get.until(ModalRoute.withName('/'));
 
     emailAddress.clear();
@@ -43,11 +48,11 @@ class SignUpAuth extends ChangeNotifier {
         },
         verificationFailed: (FirebaseAuthException e) {
           if (e.code == 'invalid-phone-number') {
-            Get.rawSnackbar(message: 'The provided phone number is not valid');
+            widgets.mySnackbar('The provided phone number is not valid');
           } else if (e.code == 'invalid-verification-code') {
-            Get.rawSnackbar(message: 'Invalid code');
+            widgets.mySnackbar('Invalid code');
           } else if (e.code == 'too-many-requests') {
-            Get.rawSnackbar(message: 'Too many requests, try after sometime');
+            widgets.mySnackbar('Too many requests, try after sometime');
           }
         },
         codeSent: (String verificationID, int? resendCode) {
@@ -55,9 +60,8 @@ class SignUpAuth extends ChangeNotifier {
           verifyID = verificationID;
           String numberOBS = phone.text.substring(6);
           shadowedPhone = 'XXXXXX$numberOBS';
-          Get.rawSnackbar(
-              message:
-                  'OTP has been sent to your mobile number $shadowedPhone');
+          widgets.mySnackbar(
+              'OTP has been sent to your mobile number $shadowedPhone');
         },
         codeAutoRetrievalTimeout: (String verificationId) {});
   }
@@ -67,15 +71,16 @@ class SignUpAuth extends ChangeNotifier {
       PhoneAuthCredential authCredential = PhoneAuthProvider.credential(
           verificationId: verifyID, smsCode: phoneOTP);
       await _auth.signInWithCredential(authCredential);
-      Get.rawSnackbar(message: 'OTP verified');
+      widgets.mySnackbar('OTP verified');
       notifyListeners();
 
       _auth.currentUser!.displayName == null
           ? Get.toNamed('/profile')
           : Get.until(ModalRoute.withName('/'));
+      db.getFirestoreList();
     } on FirebaseAuthException catch (e) {
       if (e.code == 'invalid-verification-code') {
-        Get.rawSnackbar(message: 'Invalid code');
+        widgets.mySnackbar('Invalid code');
       }
     } catch (e) {
       debugPrint(e.toString());
@@ -88,14 +93,14 @@ class SignUpAuth extends ChangeNotifier {
       cPassword == password
           ? await _auth.createUserWithEmailAndPassword(
               email: emailAddress, password: cPassword)
-          : Get.rawSnackbar(message: "Password doesn't match");
+          : widgets.mySnackbar("Password doesn't match");
     } on FirebaseAuthException catch (e) {
       if (e.code == 'weak-password') {
-        Get.rawSnackbar(message: 'The password provided is too weak.');
+        widgets.mySnackbar('The password provided is too weak.');
       } else if (e.code == 'invalid-email') {
-        Get.rawSnackbar(message: 'Enter valid email address.');
+        widgets.mySnackbar('Enter valid email address.');
       } else if (e.code == 'email-already-in-use') {
-        Get.rawSnackbar(message: 'The account already exists for that email.');
+        widgets.mySnackbar('The account already exists for that email.');
       }
     } catch (e) {
       debugPrint(e.toString());

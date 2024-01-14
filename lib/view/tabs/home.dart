@@ -1,5 +1,7 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
+import 'package:habit_tracker/controller/cloud/cloud_constants.dart';
 import 'package:provider/provider.dart';
 import '../../controller/db_controller.dart';
 import '../widgets/habit_tile.dart';
@@ -16,12 +18,27 @@ class MyHomeTab extends StatefulWidget {
 
 class _MyHomeTabState extends State<MyHomeTab> {
   DateTime? startDate;
+  var firestore =
+      FirebaseFirestore.instance.collection(CloudConstants.collections);
+  User? user = FirebaseAuth.instance.currentUser;
 
   @override
   void initState() {
-    startDate = DbController.habbitListKeytoDateTime(
-        DbController.habbitListKey(DateTime.now()));
+    _getStartDate();
     super.initState();
+  }
+
+  _getStartDate() async {
+    if (user != null) {
+      var snapshot =
+          await firestore.doc(CloudConstants.docName + user!.uid).get();
+      startDate = DbController.habbitListKeytoDateTime(
+              snapshot.get(CloudConstants.startDateKey)) ??
+          DbController.habbitListKey(DateTime.now());
+    } else {
+      startDate = DbController.habbitListKeytoDateTime(
+          DbController.habbitListKey(DateTime.now()));
+    }
   }
 
   @override
@@ -41,7 +58,7 @@ class _MyHomeTabState extends State<MyHomeTab> {
               height: graphHeight,
               child: Consumer<DbController>(builder: (context, db, child) {
                 return MonthSummary(
-                  startDate: startDate!,
+                  startDate: startDate ?? DateTime.now(),
                   dataset: db.heatMapDataset,
                 );
               }),

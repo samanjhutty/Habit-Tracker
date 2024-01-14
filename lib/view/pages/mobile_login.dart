@@ -1,6 +1,5 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 import 'package:provider/provider.dart';
 import '../../../assets/asset_widgets.dart';
 import '../../controller/cloud/auth/signup_controller.dart';
@@ -94,7 +93,8 @@ class _MobileLoginState extends State<MobileLogin> {
                           children: [
                             const Text('Already have an Account?'),
                             TextButton(
-                                onPressed: () => Get.offNamed('/signin'),
+                                onPressed: () => Navigator.popAndPushNamed(
+                                    context, '/signin'),
                                 child: const Text('Sign In'))
                           ]))
                 ]),

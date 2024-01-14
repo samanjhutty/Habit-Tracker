@@ -1,6 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
+import 'package:habit_tracker/assets/asset_widgets.dart';
 import 'package:provider/provider.dart';
 import '../../controller/cloud/auth/signin_controller.dart';
 
@@ -25,6 +25,8 @@ class _SignInState extends State<SignIn> {
   @override
   Widget build(BuildContext context) {
     ColorScheme scheme = Theme.of(context).colorScheme;
+    MyWidgets widgets = context.read<MyWidgets>();
+
     return Material(
       child: SafeArea(
         child: Stack(children: [
@@ -78,8 +80,7 @@ class _SignInState extends State<SignIn> {
                                 .emailAddress
                                 .text
                                 .isEmpty) {
-                              Get.rawSnackbar(
-                                  message: 'Enter email address first');
+                              widgets.mySnackbar('Enter email address first');
                             } else {
                               try {
                                 await auth.sendPasswordResetEmail(
@@ -87,19 +88,18 @@ class _SignInState extends State<SignIn> {
                                         .read<SignInAuth>()
                                         .emailAddress
                                         .text);
-                                Get.rawSnackbar(
-                                    message:
-                                        'An email has been sent to your registered email with password reset link');
+                                widgets.mySnackbar(
+                                    'An email has been sent to your registered email with password reset link');
                               } on FirebaseAuthException catch (e) {
                                 if (e.code == 'invalid-email') {
-                                  Get.rawSnackbar(
-                                      message: 'Enter a valid email address');
+                                  widgets.mySnackbar(
+                                      'Enter a valid email address');
                                 } else if (e.code == 'user-not-found') {
-                                  Get.rawSnackbar(message: 'user not found');
+                                  widgets.mySnackbar('user not found');
                                 }
                               } catch (e) {
-                                Get.rawSnackbar(
-                                    message: 'something went wrong, try again');
+                                widgets.mySnackbar(
+                                    'something went wrong, try again');
                               }
                             }
                           },
@@ -166,7 +166,7 @@ class _SignInState extends State<SignIn> {
                     Row(mainAxisAlignment: MainAxisAlignment.center, children: [
                   const Text("Don't have an Account yet?"),
                   TextButton(
-                      onPressed: () => Get.toNamed('/signup'),
+                      onPressed: () => Navigator.pushNamed(context, '/signup'),
                       child: const Text('Sign Up'))
                 ]),
               )
