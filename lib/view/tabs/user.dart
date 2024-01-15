@@ -93,7 +93,7 @@ class _UserProfileState extends State<UserProfile> {
                                   trailing: CircleAvatar(
                                     onBackgroundImageError:
                                         (exception, stackTrace) {
-                                      print('Image error $exception');
+                                      print('Image error: $exception');
                                     },
                                     backgroundImage: NetworkImage(
                                         auth.currentUser!.photoURL!),

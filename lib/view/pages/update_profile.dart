@@ -2,6 +2,7 @@ import 'dart:ui';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:provider/provider.dart';
 import '../../../assets/asset_widgets.dart';
 import '../../controller/cloud/auth/profile_controller.dart';
@@ -133,7 +134,7 @@ class _UpdateProfileState extends State<UpdateProfile> {
                               title: 'Update', progress: true);
                           await profile.updateProfile();
                           wgtNext = mywidgets.myAnimation(title: 'Update');
-                          Navigator.popUntil(context, ModalRoute.withName('/'));
+                          Get.until(ModalRoute.withName('/'));
                         }
                       },
                       child: wgtNext));

@@ -18,9 +18,15 @@ class DbController extends ChangeNotifier {
   final User? _user = FirebaseAuth.instance.currentUser;
   MyWidgets myWidgets = MyWidgets();
 
-  ///Get the list saved in user's database
+  ///Refreshes the controller again if not auto refreshed,
+  ///only to be used as a last resort if anything else doesn't work.
+  // void reRefresh() {
+  //   notifyListeners();
+  // }
+
+  ///Get the list saved in user's database.
   ///only to be used when logging in, not to invoke when app starts or builds
-  ///for a seamless experience
+  ///for a seamless experience.
   getFirestoreList() async {
     try {
       var snapshot =
@@ -41,7 +47,7 @@ class DbController extends ChangeNotifier {
     }
   }
 
-  ///Saves the provided theme color in local storage
+  ///Saves the provided theme color in local storage,
   ///and also notifies all listners.
   void changeTheme(Color themeColor) {
     box.put(BoxConstants.appThemeColorValue, themeColor.value);
@@ -63,7 +69,7 @@ class DbController extends ChangeNotifier {
     }
   }
 
-  ///update List on Changes to Databse
+  ///update List on Changes to Databse,
   ///not to call when updating list items, only call when secondary function is perform like deleting a habit. So that it can save changes to db.
   void saveUpdatedList() async {
     _user != null
@@ -80,12 +86,12 @@ class DbController extends ChangeNotifier {
     notifyListeners();
   }
 
-  ///Return a Map to store values to firestore
+  ///Return a Map to store values to firestore.
   Map<String, dynamic> toMap(String key, dynamic data) => {key: data};
 
-  ///Converts a List<HabitModel> to List of Map<String, dynamic>
+  ///Converts a List<HabitModel> to List of Map<String, dynamic>.
   ///
-  ///helps in storing values to firestore
+  ///helps in storing values to firestore.
   List<Map<String, dynamic>> habitListToMap(List<HabitModel> habitList) {
     List<Map<String, dynamic>> mapList = [];
     for (HabitModel element in habitList) {
@@ -161,8 +167,8 @@ class DbController extends ChangeNotifier {
     return time;
   }
 
-  ///Converts Datetime object to a String of Integers containing date, eg :20240101.
-  ///helps in storing to db
+  ///Converts Datetime object to a String of Integers containing date, eg :20240101,
+  ///helps in storing to db.
   static String habbitListKey(DateTime date) {
     String year = date.year.toString();
     String month =
@@ -173,8 +179,8 @@ class DbController extends ChangeNotifier {
     return year + month + day;
   }
 
-  ///Converts String of Integers to a Datetime object.
-  ///helps in getting date from db
+  ///Converts String of Integers to a Datetime object,
+  ///helps in getting date from db.
   static habbitListKeytoDateTime(String date) {
     int year = int.parse(date.substring(0, 4));
     int month = int.parse(date.substring(4, 6));
@@ -208,6 +214,7 @@ class DbController extends ChangeNotifier {
                       onPressed: () {
                         habitList[index].initialHabbitTime = 0;
                         habitList[index].elapsedTime = 0;
+                        habitList[index].completed = false;
                         notifyListeners();
 
                         Navigator.pop(context);
@@ -222,7 +229,6 @@ class DbController extends ChangeNotifier {
               ));
     }
     DateTime time = DateTime.now();
-    print('completed: ${habitList[index].completed}');
     if (habitList[index].running!) {
       Timer.periodic(const Duration(seconds: 1), (Timer timer) async {
         if (habitList[index].running == false) {
@@ -250,8 +256,8 @@ class DbController extends ChangeNotifier {
 
           // show notification
           notifyHabit();
-
-          percentCompleted();
+          print('completed: ${habitList[index].completed}');
+          await percentCompleted();
           await loadHeatMap();
           notifyListeners();
           _user != null
@@ -294,12 +300,15 @@ class DbController extends ChangeNotifier {
   Future<void> percentCompleted() async {
     double completed = 0.0;
     for (int i = 0; i < habitList.length; i++) {
+      print(habitList[i]);
+
       if (habitList[i].completed == true) {
         completed++;
       }
     }
     double percentSummary =
         habitList.isNotEmpty ? completed / habitList.length : 0.0;
+    print('list length: ${habitList.length}');
     _user != null
         ? await firestore.doc(CloudConstants.docName + _user.uid).set(
             toMap(
@@ -314,12 +323,22 @@ class DbController extends ChangeNotifier {
 
   ///Heatmap enteries for graph
   loadHeatMap() async {
-    DateTime date = habbitListKeytoDateTime(box.get(BoxConstants.startDateKey));
+    var doc = _user != null
+        ? await firestore.doc(CloudConstants.docName + _user.uid).get()
+        : null;
+    DateTime date = habbitListKeytoDateTime(doc != null
+        ? doc.get(CloudConstants.startDateKey)
+        : box.get(BoxConstants.startDateKey));
 
     int dayInBW = DateTime.now().difference(date).inDays;
     for (int i = 0; i <= dayInBW; i++) {
-      double strength =
-          box.get(BoxConstants.habitSummaryText + habbitListKey(date)) ?? 0;
+      double strength = doc != null
+          ? doc.data()!.containsKey(
+                  CloudConstants.habitSummaryText + habbitListKey(date))
+              ? doc.get(CloudConstants.habitSummaryText + habbitListKey(date))
+              : 0
+          : box.get(BoxConstants.habitSummaryText + habbitListKey(date),
+              defaultValue: 0);
 
       int year = date.year;
       int month = date.month;
@@ -329,7 +348,9 @@ class DbController extends ChangeNotifier {
       };
 
       heatMapDataset.addEntries(summary.entries);
+      print(heatMapDataset.entries);
       date = date.add(const Duration(days: 1));
     }
+    notifyListeners();
   }
 }

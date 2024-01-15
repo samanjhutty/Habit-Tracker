@@ -82,7 +82,7 @@ class _AddHabitState extends State<AddHabit> {
                         },
                         inputFormatters: [
                           FilteringTextInputFormatter.allow(
-                              RegExp(r'[a-zA-Z\s]')),
+                              RegExp(r'[a-zA-Z\s\d]')),
                         ],
                         decoration: const InputDecoration(
                             border: OutlineInputBorder(),
