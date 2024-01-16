@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:habit_tracker/controller/cloud/auth/profile_controller.dart';
 import 'package:habit_tracker/controller/cloud/auth/signin_controller.dart';
 import 'package:habit_tracker/controller/cloud/auth/signup_controller.dart';
@@ -93,7 +94,9 @@ class _UserProfileState extends State<UserProfile> {
                                   trailing: CircleAvatar(
                                     onBackgroundImageError:
                                         (exception, stackTrace) {
-                                      print('Image error: $exception');
+                                      Get.rawSnackbar(
+                                          message:
+                                              'Internet connection is not stable');
                                     },
                                     backgroundImage: NetworkImage(
                                         auth.currentUser!.photoURL!),

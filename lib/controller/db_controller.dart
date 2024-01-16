@@ -31,8 +31,12 @@ class DbController extends ChangeNotifier {
     try {
       var snapshot =
           await firestore.doc(CloudConstants.docName + _user!.uid).get();
-      List dataMap = snapshot.get(CloudConstants.habitListKeyText +
-          DbController.habbitListKey(DateTime.now()));
+      List dataMap = snapshot.data()!.containsKey(
+              CloudConstants.habitListKeyText +
+                  DbController.habbitListKey(DateTime.now()))
+          ? snapshot.get(CloudConstants.habitListKeyText +
+              DbController.habbitListKey(DateTime.now()))
+          : [];
 
       List<Map<String, dynamic>> habitListMap =
           dataMap.cast<Map<String, dynamic>>();
@@ -41,9 +45,8 @@ class DbController extends ChangeNotifier {
         habitList.add(HabitModel.fromMap(element));
         notifyListeners();
       }
-      print('list loaded from cloud');
     } catch (e) {
-      print('Unexpected error occured: $e');
+      Get.rawSnackbar(message: 'Internet connection is not stable');
     }
   }
 
@@ -123,7 +126,6 @@ class DbController extends ChangeNotifier {
         : await box.put(
             BoxConstants.habitListKeyText + habbitListKey(DateTime.now()),
             habitList);
-    print('habit added ${_user?.uid ?? 'to box'}');
     notifyListeners();
   }
 
@@ -148,8 +150,6 @@ class DbController extends ChangeNotifier {
             toMap(listDayKey, habitListToMap(habitList)),
             SetOptions(merge: true))
         : await box.put(listDayKey, habitList);
-    print('habit updated');
-
     notifyListeners();
   }
 
@@ -232,8 +232,6 @@ class DbController extends ChangeNotifier {
     if (habitList[index].running!) {
       Timer.periodic(const Duration(seconds: 1), (Timer timer) async {
         if (habitList[index].running == false) {
-          // print(
-          //     'time running: ${habitList[index].elapsedTime.toStringAsFixed(2)}');
           _user != null
               ? await firestore.doc(CloudConstants.docName + _user.uid).set(
                   toMap(
@@ -256,7 +254,6 @@ class DbController extends ChangeNotifier {
 
           // show notification
           notifyHabit();
-          print('completed: ${habitList[index].completed}');
           await percentCompleted();
           await loadHeatMap();
           notifyListeners();
@@ -270,7 +267,6 @@ class DbController extends ChangeNotifier {
               : await box.put(
                   BoxConstants.habitListKeyText + habbitListKey(DateTime.now()),
                   habitList);
-          print('list updated');
           timer.cancel();
           myWidgets.mySnackbar('Habbit completed');
         } else {
@@ -279,8 +275,6 @@ class DbController extends ChangeNotifier {
           habitList[index].initialHabbitTime =
               ((time2.difference(time).inSeconds) / 60).toDouble();
           notifyListeners();
-          // print(
-          //     'total time ${habitList[index].title}: ${habitList[index].initialHabbitTime.toStringAsFixed(2)}');
         }
       });
     }
@@ -300,15 +294,12 @@ class DbController extends ChangeNotifier {
   Future<void> percentCompleted() async {
     double completed = 0.0;
     for (int i = 0; i < habitList.length; i++) {
-      print(habitList[i]);
-
       if (habitList[i].completed == true) {
         completed++;
       }
     }
     double percentSummary =
         habitList.isNotEmpty ? completed / habitList.length : 0.0;
-    print('list length: ${habitList.length}');
     _user != null
         ? await firestore.doc(CloudConstants.docName + _user.uid).set(
             toMap(
@@ -318,7 +309,6 @@ class DbController extends ChangeNotifier {
         : await box.put(
             BoxConstants.habitSummaryText + habbitListKey(DateTime.now()),
             percentSummary);
-    print('Percent completed: $percentSummary');
   }
 
   ///Heatmap enteries for graph
@@ -342,8 +332,6 @@ class DbController extends ChangeNotifier {
           : box.get(BoxConstants.habitSummaryText + habbitListKey(date),
               defaultValue: 0);
 
-      print('$date, Strength: $strength');
-
       int year = date.year;
       int month = date.month;
       int day = date.day;
@@ -352,7 +340,6 @@ class DbController extends ChangeNotifier {
       };
 
       heatMapDataset.addEntries(summary.entries);
-      //print(heatMapDataset.entries);
       date = date.add(const Duration(days: 1));
     }
     notifyListeners();

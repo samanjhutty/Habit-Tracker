@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:percent_indicator/percent_indicator.dart';
 import 'package:provider/provider.dart';
 import '../../controller/cloud/cloud_constants.dart';
@@ -38,9 +39,8 @@ class _HabitTileState extends State<HabitTile> {
       setState(() {
         db.habitList = localList.cast<HabitModel>();
       });
-      print('list loaded from box');
     } catch (e) {
-      print('Unexpected error occured: $e');
+      Get.rawSnackbar(message: 'Internet connection is not stable');
     }
   }
 
@@ -68,9 +68,8 @@ class _HabitTileState extends State<HabitTile> {
           db.habitList.add(HabitModel.fromMap(element));
         });
       }
-      print('list loaded from cloud');
     } catch (e) {
-      print('Unexpected error occured: $e');
+      Get.rawSnackbar(message: 'Internet connection is not stable');
     }
   }
 
