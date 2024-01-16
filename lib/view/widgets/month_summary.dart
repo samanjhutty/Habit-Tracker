@@ -3,7 +3,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_heatmap_calendar/flutter_heatmap_calendar.dart';
 import 'package:provider/provider.dart';
-
 import '../../controller/cloud/cloud_constants.dart';
 import '../../controller/db_controller.dart';
 
@@ -59,30 +58,20 @@ class _MonthSummaryState extends State<MonthSummary> {
           child: startDate == null
               ? const Center(child: CircularProgressIndicator())
               : Consumer<DbController>(builder: (context, db, child) {
-                  return Stack(
-                    alignment: Alignment.topRight,
-                    children: [
-                      Center(
-                        child: HeatMap(
-                          startDate: startDate,
-                          endDate: DateTime.now(),
-                          defaultColor: scheme.secondary,
-                          datasets: db.heatMapDataset,
-                          colorMode: ColorMode.opacity,
-                          textColor: Colors.white70,
-                          showText: true,
-                          showColorTip: false,
-                          scrollable: false,
-                          colorsets: {1: scheme.primary},
-                          size: 30,
-                        ),
-                      ),
-                      IconButton(
-                          onPressed: () async {
-                            await db.loadHeatMap();
-                          },
-                          icon: const Icon(Icons.refresh))
-                    ],
+                  return Center(
+                    child: HeatMap(
+                      startDate: startDate,
+                      endDate: DateTime.now(),
+                      defaultColor: scheme.secondary,
+                      datasets: db.heatMapDataset,
+                      colorMode: ColorMode.opacity,
+                      textColor: Colors.white70,
+                      showText: true,
+                      showColorTip: false,
+                      scrollable: false,
+                      colorsets: {1: scheme.primary},
+                      size: 30,
+                    ),
                   );
                 })),
     );
