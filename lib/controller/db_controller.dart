@@ -335,10 +335,14 @@ class DbController extends ChangeNotifier {
       double strength = doc != null
           ? doc.data()!.containsKey(
                   CloudConstants.habitSummaryText + habbitListKey(date))
-              ? doc.get(CloudConstants.habitSummaryText + habbitListKey(date))
+              ? double.tryParse(doc
+                  .get(CloudConstants.habitSummaryText + habbitListKey(date))
+                  .toString())
               : 0
           : box.get(BoxConstants.habitSummaryText + habbitListKey(date),
               defaultValue: 0);
+
+      print('$date, Strength: $strength');
 
       int year = date.year;
       int month = date.month;
@@ -348,7 +352,7 @@ class DbController extends ChangeNotifier {
       };
 
       heatMapDataset.addEntries(summary.entries);
-      print(heatMapDataset.entries);
+      //print(heatMapDataset.entries);
       date = date.add(const Duration(days: 1));
     }
     notifyListeners();

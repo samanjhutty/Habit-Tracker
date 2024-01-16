@@ -15,7 +15,6 @@ class MonthSummary extends StatefulWidget {
 }
 
 class _MonthSummaryState extends State<MonthSummary> {
-  bool? loadHeatmap = false;
   DateTime? startDate;
   DbController controller = DbController();
   User? user = FirebaseAuth.instance.currentUser;
@@ -46,9 +45,7 @@ class _MonthSummaryState extends State<MonthSummary> {
   }
 
   _loadHeatMap() async {
-    await controller.percentCompleted();
-    await controller.loadHeatMap();
-    loadHeatmap = true;
+    await context.read<DbController>().loadHeatMap();
     setState(() {});
   }
 
@@ -56,24 +53,38 @@ class _MonthSummaryState extends State<MonthSummary> {
   Widget build(BuildContext context) {
     ColorScheme scheme = Theme.of(context).colorScheme;
 
-    return SingleChildScrollView(
-      child: startDate == null && loadHeatmap == false
-          ? const Center(child: CircularProgressIndicator())
-          : Consumer<DbController>(builder: (context, db, child) {
-              return HeatMap(
-                startDate: startDate,
-                endDate: DateTime.now(),
-                defaultColor: scheme.secondary,
-                datasets: db.heatMapDataset,
-                colorMode: ColorMode.opacity,
-                textColor: Colors.white70,
-                showText: true,
-                showColorTip: false,
-                scrollable: false,
-                colorsets: {1: scheme.primary},
-                size: 30,
-              );
-            }),
+    return SizedBox(
+      width: double.infinity,
+      child: SingleChildScrollView(
+          child: startDate == null
+              ? const Center(child: CircularProgressIndicator())
+              : Consumer<DbController>(builder: (context, db, child) {
+                  return Stack(
+                    alignment: Alignment.topRight,
+                    children: [
+                      Center(
+                        child: HeatMap(
+                          startDate: startDate,
+                          endDate: DateTime.now(),
+                          defaultColor: scheme.secondary,
+                          datasets: db.heatMapDataset,
+                          colorMode: ColorMode.opacity,
+                          textColor: Colors.white70,
+                          showText: true,
+                          showColorTip: false,
+                          scrollable: false,
+                          colorsets: {1: scheme.primary},
+                          size: 30,
+                        ),
+                      ),
+                      IconButton(
+                          onPressed: () async {
+                            await db.loadHeatMap();
+                          },
+                          icon: const Icon(Icons.refresh))
+                    ],
+                  );
+                })),
     );
   }
 }
