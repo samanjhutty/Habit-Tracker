@@ -25,8 +25,9 @@ class DbController extends ChangeNotifier {
   // }
 
   ///Get the list saved in user's database.
-  ///only to be used when logging in, not to invoke when app starts or builds
-  ///for a seamless experience.
+  ///only to be used when logging in,for a seamless experience.
+  ///NOT TO INVOKE WHEN APP STARTS OR BUILDS, try fetching cloud list in widget
+  /// in initial state and setting state afterwards
   getFirestoreList() async {
     try {
       var snapshot =

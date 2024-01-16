@@ -58,7 +58,7 @@ class _MyBottomSheetState extends State<MyBottomSheet>
             ),
           ),
           RadioListTile(
-            value: Colors.lightGreenAccent,
+            value: const Color(0xFFB2FF59),
             groupValue: appThemeColor,
             onChanged: (value) {
               setState(() {
@@ -82,7 +82,7 @@ class _MyBottomSheetState extends State<MyBottomSheet>
             ),
           ),
           RadioListTile(
-            value: Colors.lightBlueAccent,
+            value: const Color(0xFF40C4FF),
             groupValue: appThemeColor,
             onChanged: (value) {
               setState(() {
@@ -118,10 +118,7 @@ class _MyBottomSheetState extends State<MyBottomSheet>
                       onPressed: () async {
                         Navigator.pop(context);
                         db.changeTheme(appThemeColor!);
-                        setState(() {});
-                        Get.rawSnackbar(
-                            message:
-                                'Kindly restart app if unable to see changes in Theme of app.');
+                        await Get.forceAppUpdate();
                       },
                       label: const Text('Save'),
                       icon: const Icon(Icons.check));
