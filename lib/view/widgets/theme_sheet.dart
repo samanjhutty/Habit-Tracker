@@ -115,10 +115,29 @@ class _MyBottomSheetState extends State<MyBottomSheet>
                       style: ElevatedButton.styleFrom(
                           backgroundColor: scheme.primary,
                           foregroundColor: scheme.onPrimary),
-                      onPressed: () async {
+                      onPressed: () {
                         Navigator.pop(context);
                         db.changeTheme(appThemeColor!);
-                        await Get.forceAppUpdate();
+                        showDialog(
+                            context: context,
+                            builder: (context) => AlertDialog(
+                                  title: const Text('Rebuild Now?'),
+                                  actionsPadding: const EdgeInsets.only(
+                                      right: 16, bottom: 16),
+                                  content: const Text(
+                                      'In order to set the color the app needs to rebuild, kindly save changes to avoid loosing them'),
+                                  actions: [
+                                    ElevatedButton(
+                                        onPressed: () => Navigator.pop(context),
+                                        child: const Text('Later')),
+                                    ElevatedButton(
+                                        onPressed: () async {
+                                          Navigator.pop(context);
+                                          await Get.forceAppUpdate();
+                                        },
+                                        child: const Text('Now'))
+                                  ],
+                                ));
                       },
                       label: const Text('Save'),
                       icon: const Icon(Icons.check));
