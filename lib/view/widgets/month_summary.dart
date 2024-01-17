@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_heatmap_calendar/flutter_heatmap_calendar.dart';
+import 'package:habit_tracker/controller/local/db_constants.dart';
 import 'package:provider/provider.dart';
 import '../../controller/cloud/cloud_constants.dart';
 import '../../controller/db_controller.dart';
@@ -39,7 +40,8 @@ class _MonthSummaryState extends State<MonthSummary> {
 
   _getStartDateBox() {
     startDate = DbController.habbitListKeytoDateTime(
-        DbController.habbitListKey(DateTime.now()));
+        box.get(BoxConstants.startDateKey) ??
+            DbController.habbitListKey(DateTime.now()));
     setState(() {});
   }
 

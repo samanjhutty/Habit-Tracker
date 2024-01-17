@@ -30,7 +30,7 @@ class _MyBottomSheetState extends State<MyBottomSheet>
       animationController: BottomSheet.createAnimationController(this),
       showDragHandle: true,
       onClosing: () {},
-      builder: (_) => Column(
+      builder: (context) => Column(
         mainAxisSize: MainAxisSize.min,
         children: [
           RadioListTile(
@@ -125,7 +125,7 @@ class _MyBottomSheetState extends State<MyBottomSheet>
                                   actionsPadding: const EdgeInsets.only(
                                       right: 16, bottom: 16),
                                   content: const Text(
-                                      'In order to set the color the app needs to rebuild, kindly save changes to avoid loosing them'),
+                                      'In order to apply the color to the UI the app needs to rebuild, kindly save changes to avoid loosing them'),
                                   actions: [
                                     ElevatedButton(
                                         onPressed: () => Navigator.pop(context),
