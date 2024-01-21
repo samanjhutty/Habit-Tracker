@@ -7,7 +7,8 @@ The app will work in the background as well in case of screen of device gets off
 
 ## Screenshots
 
-&emsp;&emsp; <img src="https://github.com/samanjhutty/Habit-Tracker/blob/main/screenshots/new-habit.png" width="200"> &emsp;&emsp; <img src="https://github.com/samanjhutty/Habit-Tracker/blob/main/screenshots/habit-tile.png" width="200"> &emsp;&emsp; <img src="https://github.com/samanjhutty/Habit-Tracker/blob/main/screenshots/notification.png" width="200"> &emsp;&emsp; <img src="https://github.com/samanjhutty/Habit-Tracker/blob/main/screenshots/user-tab.png" width="200"> 
+&emsp;&emsp; <img src="https://github.com/samanjhutty/Habit-Tracker/blob/main/screenshots/new-habit.png" width="200"> &emsp;&emsp; <img src="https://github.com/samanjhutty/Habit-Tracker/blob/main/screenshots/habit-tile.png" width="200"> &emsp;&emsp; <img src="https://github.com/samanjhutty/Habit-Tracker/blob/main/screenshots/notification.png" width="200"> 
+&emsp;&emsp; <img src="https://github.com/samanjhutty/Habit-Tracker/blob/main/screenshots/user-tab.png" width="200"> 
 
 
 ## Key Features
@@ -29,10 +30,12 @@ The app will work in the background as well in case of screen of device gets off
 ## Known Issues (Work in progress)
 
 - The time goes up ahead and down after pausing which could be a problem if done repeadtly it could cause habit to compete mid way.
-## Flutter Help
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+
+## Support
+
+If you like my work and feel gererous, maybe you'de like to buy me a coffee.<br/>
+
+<a href="https://www.buymeacoffee.com/samandeepsingh"><img alt="Buy me a Coffee" height="56" src="https://cdn.jsdelivr.net/npm/@intergrav/devins-badges@3/assets/cozy/donate/buymeacoffee-singular_vector.svg"></a>
 
 
