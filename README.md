@@ -1,6 +1,12 @@
 
 # <img src="https://github.com/samanjhutty/Habit-Tracker/blob/main/android/app/src/main/res/mipmap-mdpi/ic_launcher.png" width="30" height="30"> Habit Tracker 
 
+![Version](https://img.shields.io/github/v/release/samanjhutty/habit-tracker)
+![License](https://img.shields.io/github/license/samanjhutty/habit-tracker)
+![repo size](https://img.shields.io/github/repo-size/samanjhutty/habit-tracker)
+![Release Date](https://img.shields.io/github/release-date/samanjhutty/habit-tracker)
+![ commits since latest release](https://img.shields.io/github/commits-since/samanjhutty/habit-tracker/latest)
+  
 Tracks yor daily habits and keeps tracks of, Summary graph at top to show how good you've done past few days. Ability to store data to local storage or cloud if signed in, fully integrated with Firebase authenticaion and firestore functions.
 The app will work in the background as well in case of screen of device gets off/Locked the habit will still be running in the background.
 
@@ -8,7 +14,8 @@ The app will work in the background as well in case of screen of device gets off
 ## Screenshots
 
 &emsp;&emsp; <img src="https://github.com/samanjhutty/Habit-Tracker/blob/main/screenshots/new-habit.png" width="200"> &emsp;&emsp; <img src="https://github.com/samanjhutty/Habit-Tracker/blob/main/screenshots/habit-tile.png" width="200"> &emsp;&emsp; <img src="https://github.com/samanjhutty/Habit-Tracker/blob/main/screenshots/notification.png" width="200"> 
-&emsp;&emsp; <img src="https://github.com/samanjhutty/Habit-Tracker/blob/main/screenshots/user-tab.png" width="200"> 
+
+<br/>&emsp;&emsp; <img src="https://github.com/samanjhutty/Habit-Tracker/blob/main/screenshots/user-tab.png" width="200"> 
 
 
 ## Key Features
@@ -39,3 +46,6 @@ If you like my work and feel gererous, maybe you'de like to buy me a coffee.<br/
 <a href="https://www.buymeacoffee.com/samandeepsingh"><img alt="Buy me a Coffee" height="56" src="https://cdn.jsdelivr.net/npm/@intergrav/devins-badges@3/assets/cozy/donate/buymeacoffee-singular_vector.svg"></a>
 
 
+## License
+
+Licensed under the [MIT License](https://choosealicense.com/licenses/mit/), Copyright © 2024-present Samandeep Singh
