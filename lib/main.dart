@@ -75,6 +75,7 @@ class MyApp extends StatelessWidget {
           '/reauth': (p0) => const ReAuthenticate()
         },
         title: 'Tracker',
+        debugShowCheckedModeBanner: false,
         theme: ThemeData(
           colorScheme: ColorScheme.fromSeed(
               seedColor: color, secondary: Colors.grey[350]),

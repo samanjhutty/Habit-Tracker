@@ -105,6 +105,126 @@ class _MyBottomSheetState extends State<MyBottomSheet>
               ],
             ),
           ),
+          RadioListTile(
+            value: const Color(0xFFE040FB),
+            groupValue: appThemeColor,
+            onChanged: (value) {
+              setState(() {
+                appThemeColor = value!;
+              });
+            },
+            title: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                const Text('Purple'),
+                Container(
+                  decoration: BoxDecoration(
+                      color: scheme.secondary, shape: BoxShape.circle),
+                  padding: const EdgeInsets.all(4),
+                  child: const CircleAvatar(
+                    radius: 16,
+                    backgroundColor: Color(0xFFE040FB),
+                  ),
+                )
+              ],
+            ),
+          ),
+          RadioListTile(
+            value: const Color(0xFF64FFDA),
+            groupValue: appThemeColor,
+            onChanged: (value) {
+              setState(() {
+                appThemeColor = value!;
+              });
+            },
+            title: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                const Text('Teal'),
+                Container(
+                  decoration: BoxDecoration(
+                      color: scheme.secondary, shape: BoxShape.circle),
+                  padding: const EdgeInsets.all(4),
+                  child: const CircleAvatar(
+                    radius: 16,
+                    backgroundColor: Color(0xFF64FFDA),
+                  ),
+                )
+              ],
+            ),
+          ),
+          RadioListTile(
+            value: const Color(0xFF536DFE),
+            groupValue: appThemeColor,
+            onChanged: (value) {
+              setState(() {
+                appThemeColor = value!;
+              });
+            },
+            title: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                const Text('Indigo'),
+                Container(
+                  decoration: BoxDecoration(
+                      color: scheme.secondary, shape: BoxShape.circle),
+                  padding: const EdgeInsets.all(4),
+                  child: const CircleAvatar(
+                    radius: 16,
+                    backgroundColor: Color(0xFF536DFE),
+                  ),
+                )
+              ],
+            ),
+          ),
+          RadioListTile(
+            value: const Color(0xFFFFD740),
+            groupValue: appThemeColor,
+            onChanged: (value) {
+              setState(() {
+                appThemeColor = value!;
+              });
+            },
+            title: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                const Text('Amber'),
+                Container(
+                  decoration: BoxDecoration(
+                      color: scheme.secondary, shape: BoxShape.circle),
+                  padding: const EdgeInsets.all(4),
+                  child: const CircleAvatar(
+                    radius: 16,
+                    backgroundColor: Color(0xFFFFD740),
+                  ),
+                )
+              ],
+            ),
+          ),
+          RadioListTile(
+            value: const Color(0xFFFF6E40),
+            groupValue: appThemeColor,
+            onChanged: (value) {
+              setState(() {
+                appThemeColor = value!;
+              });
+            },
+            title: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                const Text('Deep Orange'),
+                Container(
+                  decoration: BoxDecoration(
+                      color: scheme.secondary, shape: BoxShape.circle),
+                  padding: const EdgeInsets.all(4),
+                  child: const CircleAvatar(
+                    radius: 16,
+                    backgroundColor: Color(0xFFFF6E40),
+                  ),
+                )
+              ],
+            ),
+          ),
           Padding(
             padding: const EdgeInsets.all(8),
             child: Row(
