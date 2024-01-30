@@ -76,22 +76,21 @@ class _HabitTileState extends State<HabitTile> {
   @override
   Widget build(BuildContext context) {
     ColorScheme scheme = Theme.of(context).colorScheme;
-    DbController db = context.read<DbController>();
 
-    return db.habitList.isEmpty
-        ? const Center(
-            child: Text(
-              "No habbit maintained, let's build a new one!",
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                color: Colors.grey,
+    return Consumer<DbController>(builder: (context, db, child) {
+      return db.habitList.isEmpty
+          ? const Center(
+              child: Text(
+                "No habbit maintained, let's build a new one!",
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  color: Colors.grey,
+                ),
               ),
-            ),
-          )
-        : ListView.builder(
-            itemCount: db.habitList.length,
-            itemBuilder: ((context, index) {
-              return Consumer<DbController>(builder: (context, db, child) {
+            )
+          : ListView.builder(
+              itemCount: db.habitList.length,
+              itemBuilder: ((context, index) {
                 HabitModel list = db.habitList[index];
                 if (list.completed == true) {
                   list.initialHabbitTime = list.totalHabbitTime;
@@ -222,7 +221,7 @@ class _HabitTileState extends State<HabitTile> {
                         ),
                       ),
                     ));
-              });
-            }));
+              }));
+    });
   }
 }

@@ -34,7 +34,7 @@ void main() async {
   Hive.registerAdapter(HabitModelAdapter());
   box = await Hive.openBox(BoxConstants.boxName);
   AwesomeNotifications().initialize(
-      null,
+      'lib/assets/images/logo.png',
       [
         NotificationChannel(
             channelKey: 'Habit-Completed',
