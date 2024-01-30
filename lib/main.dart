@@ -41,7 +41,7 @@ void main() async {
             channelName: 'Habit Completed',
             channelDescription: 'Notifies when a habit is Completed')
       ],
-      debug: true);
+      debug: false);
 
   runApp(const MyApp());
 }
