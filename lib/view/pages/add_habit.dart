@@ -1,4 +1,3 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
@@ -22,10 +21,7 @@ class _AddHabitState extends State<AddHabit> {
   TextEditingController timeController = TextEditingController();
 
   final formkey = GlobalKey<FormState>();
-  TimeOfDay? time = kDebugMode
-      ? const TimeOfDay(hour: 0, minute: 1)
-      : const TimeOfDay(hour: 1, minute: 0);
-
+  TimeOfDay? time = const TimeOfDay(hour: 0, minute: 30);
   TimeController timedb = TimeController();
   bool isStarted = false;
 
@@ -174,6 +170,13 @@ class _AddHabitState extends State<AddHabit> {
                                                   DbController.habbitListKey(
                                                       DateTime.now()),
                                               isStart: isStarted);
+
+                                      if (isStarted) {
+                                        db.habitOnTap(
+                                            context: context,
+                                            index: db.habitList
+                                                .indexOf(db.habitList.last));
+                                      }
                                       Navigator.pop(context);
                                     }
                                   },

@@ -2,7 +2,6 @@ import 'dart:async';
 import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:habit_tracker/assets/asset_widgets.dart';
@@ -162,9 +161,7 @@ class DbController extends ChangeNotifier {
             child: child!),
         initialEntryMode: TimePickerEntryMode.input,
         context: context,
-        initialTime: kDebugMode
-            ? const TimeOfDay(hour: 0, minute: 1)
-            : const TimeOfDay(hour: 1, minute: 0));
+        initialTime: const TimeOfDay(hour: 0, minute: 30));
     return time;
   }
 
@@ -327,8 +324,10 @@ class DbController extends ChangeNotifier {
           ? doc.data()!.containsKey(
                   CloudConstants.habitSummaryText + habbitListKey(date))
               ? double.tryParse(doc
-                  .get(CloudConstants.habitSummaryText + habbitListKey(date))
-                  .toString())
+                      .get(
+                          CloudConstants.habitSummaryText + habbitListKey(date))
+                      .toString()) ??
+                  0
               : 0
           : box.get(BoxConstants.habitSummaryText + habbitListKey(date),
               defaultValue: 0);
@@ -343,6 +342,5 @@ class DbController extends ChangeNotifier {
       heatMapDataset.addEntries(summary.entries);
       date = date.add(const Duration(days: 1));
     }
-    notifyListeners();
   }
 }
