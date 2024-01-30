@@ -5,7 +5,7 @@
 ![License](https://img.shields.io/github/license/samanjhutty/habit-tracker)
 ![repo size](https://img.shields.io/github/repo-size/samanjhutty/habit-tracker)
 ![Release Date](https://img.shields.io/github/release-date/samanjhutty/habit-tracker)
-![ commits since latest release](https://img.shields.io/github/commits-since/samanjhutty/habit-tracker/latest)
+[![Codemagic build status](https://api.codemagic.io/apps/65ae4701de33db4db004cde1/65ae4701de33db4db004cde0/status_badge.svg)](https://codemagic.io/apps/65ae4701de33db4db004cde1/65ae4701de33db4db004cde0/latest_build)
   
 Tracks yor daily habits and keeps tracks of, Summary graph at top to show how good you've done past few days. Ability to store data to local storage or cloud if signed in, fully integrated with Firebase authenticaion and firestore functions.
 The app will work in the background as well in case of screen of device gets off/Locked the habit will still be running in the background.
