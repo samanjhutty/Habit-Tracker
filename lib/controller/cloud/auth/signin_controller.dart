@@ -19,7 +19,7 @@ class SignInAuth with ChangeNotifier {
       await _signInWithEmail(emailAddress.text.trim(), password.text.trim())
           .whenComplete(() {
         db.getFirestoreList();
-
+        db.loadHeatMap();
         emailAddress.clear();
         password.clear();
       });
@@ -71,6 +71,7 @@ class SignInAuth with ChangeNotifier {
       notifyListeners();
       Get.until(ModalRoute.withName('/'));
       db.getFirestoreList();
+      db.loadHeatMap();
       widgets.mySnackbar('Logged in via Google');
     } on FirebaseAuthException {
       Get.until(ModalRoute.withName('/'));

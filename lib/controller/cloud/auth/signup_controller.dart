@@ -27,7 +27,9 @@ class SignUpAuth extends ChangeNotifier {
         confirmPassword.text.trim());
     await profile.updateProfile();
     db.getFirestoreList();
+    db.loadHeatMap();
     notifyListeners();
+
     widgets.mySnackbar('Account created sucessfully');
     Get.until(ModalRoute.withName('/'));
 
@@ -78,6 +80,7 @@ class SignUpAuth extends ChangeNotifier {
           ? Get.toNamed('/profile')
           : Get.until(ModalRoute.withName('/'));
       db.getFirestoreList();
+      db.loadHeatMap();
     } on FirebaseAuthException catch (e) {
       if (e.code == 'invalid-verification-code') {
         widgets.mySnackbar('Invalid code');
